@@ -1,22 +1,144 @@
-import './App.css';
-import { DatePicker } from 'antd';
+import React from "react";
 
-function App() {
+import {
+  BrowserRouter as Router,
+  useRouteMatch,
+  useParams,
+  Switch,
+  Route,
+  Link
+} from "react-router-dom";
+
+export default function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <DatePicker />
-        <p>
-          Edit <code>App.js</code> and save to reload.
-        </p>
-        <a className="App-link" href="https://reactjs.org"
-           target="_blank" rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Router>
+      <div>
+        <nav>
+          <ul>
+            <li>
+              <Link to="/">Home</Link>
+            </li>
+            <li>
+              <Link to="/about">About</Link>
+            </li>
+            <li>
+              <Link to="/users">Users</Link>
+            </li>
+            <li>
+              <Link to="/notes">My Notes</Link>
+            </li>
+          </ul>
+        </nav>
+
+        <Switch>
+          {/* Shows the homescreen - user moves to notes or video */}
+          <Route exact path="/">
+            <Home />
+          </Route>
+
+          {/* Shows the list of courses the user has taken notes for */}
+          <Route exact path="/notes">
+            <AllCourses />
+          </Route>
+
+          {/* Shows the list of videos in the course 'courseId' */}
+          <Route exact path="/notes/:courseId">
+            <AllVideos />
+          </Route>
+
+          {/* Shows the notes of the specific video selected */}
+          <Route path="/notes/:courseId/:videoId">
+            <CourseNotes />
+          </Route>
+
+          {/* Shows the list of courses the user has taken notes for */}
+          <Route path="/video/:videoId">
+            <VideoNotes />
+          </Route>
+
+          {/* We can have a user manual sort of thing here? */}
+          <Route path="/about">
+            <About />
+          </Route>
+
+          {/* 404 not found */}
+          <Route path="*">
+            <NoMatch />
+          </Route>
+
+        </Switch>
+      </div>
+    </Router>
   );
 }
 
-export default App;
+function Home() {
+  return (
+    <>
+    <div>Welcome to the app</div>
+    <ul>
+      <li><Link to="/notes">View your notes</Link></li>
+      <li><Link to="/video/newId">Take new notes</Link></li>
+    </ul>
+    </>
+  )
+}
+
+function About() {
+  return <h2>About</h2>
+}
+
+function NoMatch() {
+  return <h2>404</h2>
+}
+
+// URL = '/notes'
+function AllCourses() {
+  let { url } = useRouteMatch()
+  return (
+    <>
+    <div>List of courses</div>
+    <ul>
+      <li><Link to={`${url}/c1`}>Course 1</Link></li>
+      <li><Link to={`${url}/c2`}>Course 2</Link></li>
+      <li><Link to={`${url}/c3`}>Course 3</Link></li>
+    </ul>
+    </>
+  )
+}
+
+// URL = '/notes/courseId'
+function AllVideos(){
+  let { url } = useRouteMatch()
+  let { courseId } = useParams()
+  return (
+    <>
+    <div>List of videos for course : {courseId}</div>
+    <ul>
+      <li><Link to={`${url}/v1`}>Video 1</Link></li>
+      <li><Link to={`${url}/v2`}>Video 2</Link></li>
+      <li><Link to={`${url}/v3`}>Video 3</Link></li>
+    </ul>
+    </>
+  )
+}
+
+// URL = '/notes/:courseId/:videoId'
+function CourseNotes() {
+  let { courseId, videoId } = useParams()
+  return (
+    <>
+    <div>List of notes for the video "{videoId}" of course "{courseId}"</div>
+    <ul>
+      <li>Note #1</li>
+      <li>Note #2</li>
+      <li>Note #3</li>
+    </ul>
+    </>
+  )
+}
+
+// URL = '/video/:videoId'
+function VideoNotes(){
+  return <div>You can take down notes here</div>
+}
