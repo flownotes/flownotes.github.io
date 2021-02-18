@@ -8,7 +8,8 @@ import {
   Link
 } from "react-router-dom";
 
-import Home from "./Home.js"
+import Home from "./Home"
+import AllCourses from "./AllCourses"
 import "./App.css"
 
 export default function App() {
@@ -79,19 +80,19 @@ function NoMatch() {
 }
 
 // URL = '/notes'
-function AllCourses() {
-  let { url } = useRouteMatch()
-  return (
-    <>
-    <div>List of courses</div>
-    <ul>
-      <li><Link to={`${url}/c1`}>Course 1</Link></li>
-      <li><Link to={`${url}/c2`}>Course 2</Link></li>
-      <li><Link to={`${url}/c3`}>Course 3</Link></li>
-    </ul>
-    </>
-  )
-}
+// function AllCourses() {
+//   let { url } = useRouteMatch()
+//   return (
+//     <>
+//     <div>List of courses</div>
+//     <ul>
+//       <li><Link to={`${url}/c1`}>Course 1</Link></li>
+//       <li><Link to={`${url}/c2`}>Course 2</Link></li>
+//       <li><Link to={`${url}/c3`}>Course 3</Link></li>
+//     </ul>
+//     </>
+//   )
+// }
 
 // URL = '/notes/courseId'
 function AllVideos(){

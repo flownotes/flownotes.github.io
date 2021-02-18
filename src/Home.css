@@ -1,7 +1,6 @@
 .home-shell {
     display: flex;
     min-height: 100vh;
-    background: #eff0fd;
     padding: 1em;
 }
 
