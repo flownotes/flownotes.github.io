@@ -1,5 +1,4 @@
 import React from "react";
-
 import {
   BrowserRouter as Router,
   useRouteMatch,
@@ -9,26 +8,13 @@ import {
   Link
 } from "react-router-dom";
 
+import Home from "./Home.js"
+import "./App.css"
+
 export default function App() {
   return (
     <Router>
-      <div>
-        <nav>
-          <ul>
-            <li>
-              <Link to="/">Home</Link>
-            </li>
-            <li>
-              <Link to="/about">About</Link>
-            </li>
-            <li>
-              <Link to="/users">Users</Link>
-            </li>
-            <li>
-              <Link to="/notes">My Notes</Link>
-            </li>
-          </ul>
-        </nav>
+      <div className="app-shell">
 
         <Switch>
           {/* Shows the homescreen - user moves to notes or video */}
@@ -72,17 +58,17 @@ export default function App() {
   );
 }
 
-function Home() {
-  return (
-    <>
-    <div>Welcome to the app</div>
-    <ul>
-      <li><Link to="/notes">View your notes</Link></li>
-      <li><Link to="/video/newId">Take new notes</Link></li>
-    </ul>
-    </>
-  )
-}
+// function Home() {
+//   return (
+//     <>
+//     <div>Welcome to the app</div>
+//     <ul>
+//       <li><Link to="/notes">View your notes</Link></li>
+//       <li><Link to="/video/newId">Take new notes</Link></li>
+//     </ul>
+//     </>
+//   )
+// }
 
 function About() {
   return <h2>About</h2>
