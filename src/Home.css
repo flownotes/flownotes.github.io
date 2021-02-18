@@ -35,6 +35,11 @@
 .logo-panel img {
     width: 100px;
     height: 100px;
+
+    /* padding: 7px;
+    background: #1f1f1f;
+    border-radius: 20%;
+    box-shadow: 0px 0px 7px grey; */
 }
 
 .video-link-form {
