@@ -1,0 +1,30 @@
+.courses-shell{
+  min-height: 100vh;
+}
+
+nav.all-courses-nav {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px;
+  box-shadow: 0px 1px 2px 0px darkgrey;
+  border-bottom: 1px solid #7f82af;
+}
+
+nav.all-courses-nav img{
+  /*without this img stretches*/
+  flex-grow: 0;
+}
+
+nav.all-courses-nav > p {
+  text-align: center;
+  font-size: 22px;
+  margin-bottom: 0px;
+}
+
+nav.all-courses-nav > span {
+  display: flex;
+  align-items: center;
+  font-size: 24px;
+  margin-bottom: 0px;
+}
+
