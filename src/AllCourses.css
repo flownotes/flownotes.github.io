@@ -6,6 +6,7 @@ nav.all-courses-nav {
   display: flex;
   justify-content: space-between;
   padding: 10px;
+  background: #f7f9fa;
   box-shadow: 0px 1px 2px 0px darkgrey;
   border-bottom: 1px solid #7f82af;
 }
@@ -16,15 +17,78 @@ nav.all-courses-nav img{
 }
 
 nav.all-courses-nav > p {
-  text-align: center;
-  font-size: 22px;
+  font-size: 24px;
   margin-bottom: 0px;
+  font-weight: 300;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 nav.all-courses-nav > span {
   display: flex;
   align-items: center;
+  justify-content: center;
   font-size: 24px;
   margin-bottom: 0px;
+  /* set width to match logo on the left
+  so that the title is centered */
+  width: 36px;
 }
 
+.course-container {
+  padding: 10px;
+}
+
+.course-card {
+  padding: 10px;
+  margin-bottom: 1em;
+  border: 1px solid grey;
+  background: #f7f9fa;
+  box-shadow: 0px 0px 5px 0px darkgrey;
+}
+
+.course-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 4px;
+}
+
+.course-card-header .anticon {
+  font-size: 20px;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.course-code {
+  font-size: 18px;
+  font-weight: 400;
+  margin-bottom: 0px;
+}
+.course-name {
+  font-size: 16px;
+  font-weight: 300;
+  margin-bottom: 7px;
+}
+.course-vcount{
+  color: gray;
+  margin-bottom: 3px;
+}
+
+/* 
+Dropdown UL style "ul.ant-dropdown-menu"
+{
+  border: 2px solid #b1b1b1;
+  border-radius: 2px;
+  box-shadow: 0px 2px 4px 0px #b9b8b8;
+  top: -8px; // this was in that specific usecase
+  left: -5px;
+}
+
+// also add border-bottom to menu elements
+*/
