@@ -43,10 +43,10 @@ nav.all-courses-nav > span {
 
 .course-card {
   padding: 10px;
-  margin-bottom: 1em;
-  border: 1px solid grey;
+  margin-bottom: 1.75em;
+  border: 1px solid darkgrey;
   background: #f7f9fa;
-  box-shadow: 0px 0px 5px 0px darkgrey;
+  box-shadow: 0px 0px 4px 0px darkgrey;
 }
 
 .course-card-header {
@@ -62,7 +62,7 @@ nav.all-courses-nav > span {
   height: 30px;
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-end;
 }
 
 .course-code {
@@ -80,15 +80,22 @@ nav.all-courses-nav > span {
   margin-bottom: 3px;
 }
 
-/* 
-Dropdown UL style "ul.ant-dropdown-menu"
-{
-  border: 2px solid #b1b1b1;
-  border-radius: 2px;
-  box-shadow: 0px 2px 4px 0px #b9b8b8;
-  top: -8px; // this was in that specific usecase
+.course-card-edit > .ant-dropdown-menu {
+  /*border: 2px solid #d2d2d2; */
+  border-radius: 4px;
+  box-shadow: 0px 3px 8px 2px #b8b8b8;
+  padding: 0;
+  top: -5px;
   left: -5px;
 }
 
+/* 
+Dropdown UL style "ul.ant-dropdown-menu"
+pass it through props?
+{
+  
+}
+
 // also add border-bottom to menu elements
+border-bottom: 1px solid lightgray;
 */
