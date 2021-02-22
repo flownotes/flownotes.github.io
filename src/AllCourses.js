@@ -1,8 +1,8 @@
 import React from "react"
 import Logo from "./components/Logo"
-import { Dropdown, Menu } from "antd"
+import { Dropdown, Menu, Modal, Input, Button } from "antd"
 import { PlusOutlined, SettingFilled} from '@ant-design/icons'
-import { withRouter, useHistory } from "react-router-dom";
+import { useHistory } from "react-router-dom";
 
 import "./AllCourses.css"
 
@@ -51,49 +51,200 @@ let data = {
 export default class AllCourses extends React.Component {
   constructor(props){
     super(props)
+    this.state = {
+      addModal: false,
+      editModal: false,
+      archiveModal: false,
+      deleteModal: false,
+    }
+    this.codeInputRef = null
+    this.nameInputRef = null
+    this.currentCourse = null
+  }
+
+  //get's the current course
+  currentCourseDetails = () => {
+    let code = "", name = ""
+    if (this.currentCourse !== null){
+      code = data[this.currentCourse].code || ""
+      name = data[this.currentCourse].name || ""
+    }
+    return {code, name}
+  }
+
+  // toggles the modals
+  toggleAdd = () => this.setState({addModal:!this.state.addModal})
+  toggleEdit = (key=null) => {
+    // if we're toggling false -> true, i.e. modal is opening
+    // set currentCourse to key, if it's closing, set to null
+    this.currentCourse = this.state.editModal? null : key
+    this.setState({editModal:!this.state.editModal})
+  }
+  toggleArchive = (key=null) => {
+    this.currentCourse = this.state.archiveModal? null : key
+    this.setState({archiveModal:!this.state.archiveModal})
+  }
+  toggleDelete = (key=null) => {
+    this.currentCourse = this.state.deleteModal? null : key
+    this.setState({deleteModal:!this.state.deleteModal})
+  }
+
+  addModalBody = () => (
+    <div>
+      <Input  addonBefore="Course Code" 
+              placeholder="Eg. 'CSE 170'"
+              ref={input => this.codeInputRef = input}/>
+      <Input  addonBefore="Course Title"
+              placeholder="Eg. 'Interaction Design'"
+              ref={input => this.nameInputRef = input}/>
+    </div>
+  )
+
+  editModalBody = () => {
+    let {code = "", name = ""} = this.currentCourseDetails()
+    return (
+      <div>
+        <Input  addonBefore="Course Code" 
+                placeholder="Eg. 'CSE 170'"
+                defaultValue={code}
+                ref={input => this.codeInputRef = input}/>
+        <Input  addonBefore="Course Title"
+                placeholder="Eg. 'Interaction Design'"
+                defaultValue={name}
+                ref={input => this.nameInputRef = input}/>
+      </div>
+    )
+  }
+
+  archiveModalBody = () => {
+    let {code = "", name = ""} = this.currentCourseDetails()
+    return (
+      <div>
+        Are you sure you want to archive the course <h3 style={{"display": "inline-block"}}>"{code}: {name}"</h3>?
+      </div>
+    )
+  }
+
+  deleteModalBody = () => {
+    let {code = "", name = ""} = this.currentCourseDetails()
+    return (
+      <div>
+        Are you sure you want to delete the course <h3 style={{"display": "inline-block"}}>"{code}: {name}"</h3>?
+      </div>
+    )
+  }
+
+
+  addCourse = () => {
+    let code = this.codeInputRef.state.value
+    let name = this.nameInputRef.state.value
+    console.log("Course code", code)
+    console.log("Course name", name)
+
+    let cid = "cid" + Date.now().toString()
+    data[cid] = {code, name, vcount:0, active:true}
+
+    this.toggleAdd()
+  }
+
+  editCourse = () => {
+    console.log("New course code for", this.currentCourse)
+
+    let code = this.codeInputRef.state.value
+    let name = this.nameInputRef.state.value
+    console.log("Course code", code)
+    console.log("Course name", name)
+
+    let cid = this.currentCourse
+    data[cid] = Object.assign(data[cid], {code, name})
+
+    this.toggleEdit()
+  }
+
+  archiveCourse = () => {
+    console.log("Archiving course with code", this.currentCourse)
+    data[this.currentCourse].active = false
+    this.toggleArchive()
+  }
+
+  deleteCourse = () => {
+    console.log("Deleting course with code", this.currentCourse)
+    delete data[this.currentCourse]
+    this.toggleDelete()
   }
 
   render(){
     let objs = Object.keys(data)
+    let {addModal, editModal, archiveModal, deleteModal} = this.state
     return (
       <div className="courses-shell">
-        <Nav />
+        <Nav onAddCourse={this.toggleAdd}/>
         <div className="course-container">
-          {objs.map(key => <Course key={key} {...data[key]}/>)}
+          { objs.map(key => (
+              <Course key={key} {...data[key]}
+                      onEdit={() => this.toggleEdit(key) }
+                      onArchive={() => this.toggleArchive(key)}
+                      onDelete={() => this.toggleDelete(key)}
+              />
+            )
+          )}
         </div>
+        <Modal  title="Create course"
+                visible={addModal}
+                okText="Create"
+                onOk={this.addCourse}
+                onCancel={this.toggleAdd}
+                destroyOnClose 
+                className="course-config-modal"
+              >
+          {this.addModalBody()}
+        </Modal>
+        <Modal  title="Edit course"
+                visible={editModal}
+                okText="Update"
+                cancelText="Discard changes"
+                onOk={this.editCourse}
+                onCancel={this.toggleEdit}
+                destroyOnClose 
+              >
+          {this.editModalBody()}
+        </Modal>
+        <Modal  title="Archive course"
+                visible={archiveModal}
+                okText="Archive"
+                okType="danger"
+                onOk={this.archiveCourse}
+                onCancel={this.toggleArchive}
+                destroyOnClose 
+              >
+          {this.archiveModalBody()}
+        </Modal>
+        <Modal  title="Delete course"
+                visible={deleteModal}
+                okText="Delete the course"
+                cancelText="No, go back"
+                onOk={this.deleteCourse}
+                okType="danger"
+                onCancel={this.toggleDelete}
+                destroyOnClose 
+              >
+          {this.deleteModalBody()}
+        </Modal>
       </div>
     )
   }
 }
 
-function Nav(){
-  const menu = (
-    <Menu>
-      <Menu.Item>
-        Add new course
-      </Menu.Item>
-      <Menu.Divider />
-      <Menu.Item>
-          2nd menu item
-      </Menu.Item>
-      <Menu.Divider />
-      <Menu.Item>
-          3rd menu item
-      </Menu.Item>
-      <Menu.Item danger>a danger item</Menu.Item>
-    </Menu>
-  )
+function Nav({onAddCourse}){
   let history = useHistory()
-  const goToHome = (ev) => {
+  const goToHome = () => {
     history.push(`/`)
   }
   return (
     <nav className="all-courses-nav">
-      <Logo style={{height: "36px", padding:"3px"}} onClick={goToHome}/>
+      <Logo style={{height: "36px", width:"36px", padding:"3px"}} onClick={goToHome}/>
       <p>COURSES</p>
-      <Dropdown overlay={menu} trigger={['click']} placement="bottomRight">
-        <PlusOutlined />
-      </Dropdown>
+      <PlusOutlined onClick={onAddCourse}/>
     </nav>
     )
 }
@@ -101,13 +252,10 @@ function Nav(){
 // the card ui for a single course
 function Course(props){
   const {name, code, vcount} = props
-  // const {onEdit, onArchive, onDelete} = props
-  const onEdit = () => console.log("edit")
-  const onArchive = () => console.log("archive")
-  const onDelete = () => console.log("delete")
+  const {onEdit, onArchive, onDelete} = props
 
   let history = useHistory()
-  const goToCourse = (ev) => {
+  const goToCourse = () => {
     history.push(`/notes/${code}`)
   }
 
