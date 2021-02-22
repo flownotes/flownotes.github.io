@@ -57,6 +57,7 @@ export default class AllCourses extends React.Component {
       editModal: false,
       archiveModal: false,
       deleteModal: false,
+      unArchiveModal: false,
     }
     this.codeInputRef = null
     this.nameInputRef = null
@@ -84,6 +85,10 @@ export default class AllCourses extends React.Component {
   toggleArchive = (key=null) => {
     this.currentCourse = this.state.archiveModal? null : key
     this.setState({archiveModal:!this.state.archiveModal})
+  }
+  toggleUnArchive = (key=null) => {
+    this.currentCourse = this.state.unArchiveModal? null : key
+    this.setState({unArchiveModal:!this.state.unArchiveModal})
   }
   toggleDelete = (key=null) => {
     this.currentCourse = this.state.deleteModal? null : key
@@ -121,6 +126,16 @@ export default class AllCourses extends React.Component {
     return (
       <div className="archive-message">
         <p>Are you sure you want to archive</p>
+        <h2>{code}</h2>
+        <h3>{name}</h3>
+      </div>
+    )
+  }
+  unArchiveModalBody = () => {
+    let {code = "", name = ""} = this.currentCourseDetails()
+    return (
+      <div className="archive-message">
+        <p>Are you sure you want to unarchive</p>
         <h2>{code}</h2>
         <h3>{name}</h3>
       </div>
@@ -164,6 +179,12 @@ export default class AllCourses extends React.Component {
     this.toggleArchive()
     message.success(<span>Course "<b>{code}</b> : {name}" successfully archived!</span>)
   }
+  unArchiveCourse = () => {
+    let {code, name} = data[this.currentCourse]
+    data[this.currentCourse].active = true
+    this.toggleUnArchive()
+    message.success(<span>Course "<b>{code}</b> : {name}" successfully unarchived!</span>)
+  }
   deleteCourse = () => {
     let {code, name} = data[this.currentCourse]
     delete data[this.currentCourse]
@@ -173,7 +194,7 @@ export default class AllCourses extends React.Component {
 
   render(){
     let objs = Object.keys(data)
-    let {addModal, editModal, archiveModal, deleteModal} = this.state
+    let {addModal, editModal, archiveModal, deleteModal, unArchiveModal} = this.state
     return (
       <div className="courses-shell">
         <Nav onAddCourse={this.toggleAdd}/>
@@ -195,7 +216,7 @@ export default class AllCourses extends React.Component {
             { objs.filter(key => !data[key].active)
                   .map(key => <Course key={key} {...data[key]}
                               onEdit={() => this.toggleEdit(key) }
-                              onArchive={() => this.toggleArchive(key)}
+                              onUnArchive={() => this.toggleUnArchive(key)}
                               onDelete={() => this.toggleDelete(key)} />
                       )
             }
@@ -234,6 +255,17 @@ export default class AllCourses extends React.Component {
               >
           {this.archiveModalBody()}
         </Modal>
+        <Modal  title={<span className="title">Unarchive course</span>}
+                visible={unArchiveModal}
+                okText="Unarchive"
+                okType="primary"
+                onOk={this.unArchiveCourse}
+                onCancel={this.toggleUnArchive}
+                destroyOnClose
+                className="course-config-modal"
+              >
+          {this.unArchiveModalBody()}
+        </Modal>
         <Modal  title={<span className="title"><WarningFilled className="delt-icon"/> Delete course</span>}
                 visible={deleteModal}
                 okText="Delete the course"
@@ -269,14 +301,14 @@ function Nav({onAddCourse}){
 // the card ui for a single course
 function Course(props){
   const {name, code, vcount} = props
-  const {onEdit, onArchive, onDelete} = props
+  const {onEdit, onArchive, onDelete, onUnArchive} = props
 
   let history = useHistory()
   const goToCourse = () => {
     history.push(`/notes/${code}`)
   }
 
-  const menu = courseCardMenu(onEdit, onArchive, onDelete)
+  const menu = courseCardMenu({onEdit, onArchive, onDelete, onUnArchive})
 
   return(
     <div className="course-card" onClick={goToCourse}>
@@ -297,15 +329,19 @@ function Course(props){
   )
 }
 
-const courseCardMenu = (onEdit, onArchive, onDelete) => (
+const courseCardMenu = ({onEdit, onArchive, onDelete, onUnArchive}) => (
   <Menu onClick={(e) => e.domEvent.stopPropagation()}>
     <Menu.Item onClick={onEdit}>
       Edit Course
     </Menu.Item>
     <Menu.Divider />
-    <Menu.Item onClick={onArchive}>
-      Archive Course
-    </Menu.Item>
+    {onArchive? 
+        (<Menu.Item onClick={onArchive}>
+          Archive Course
+        </Menu.Item>) 
+    :   (<Menu.Item onClick={onUnArchive}>
+          Unarchive Course
+        </Menu.Item>)}
     <Menu.Divider />
     <Menu.Item danger onClick={onDelete}>
        Delete Course
