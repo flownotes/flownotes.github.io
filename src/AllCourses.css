@@ -37,6 +37,12 @@ nav.all-courses-nav > span {
   width: 36px;
 }
 
+nav.all-courses-nav > span:hover {
+  background: darkgrey;
+  color: white;
+  border-radius: 7px;
+}
+
 .course-container {
   padding: 10px;
 }
