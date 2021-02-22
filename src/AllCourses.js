@@ -1,7 +1,7 @@
 import React from "react"
 import Logo from "./components/Logo"
-import { Dropdown, Menu, Modal, Input, Collapse } from "antd"
-import { PlusOutlined, SettingFilled, WarningFilled, CaretRightFilled} from '@ant-design/icons'
+import { Dropdown, Menu, Modal, Input, Collapse, message } from "antd"
+import { PlusOutlined, SettingFilled, WarningFilled } from '@ant-design/icons'
 import { useHistory } from "react-router-dom";
 
 import "./AllCourses.css"
@@ -147,6 +147,7 @@ export default class AllCourses extends React.Component {
     let cid = "cid" + Date.now().toString()
     data[cid] = {code, name, vcount:0, active:true}
     this.toggleAdd()
+    message.success(<span>Course "<b>{code}</b> : {name}" successfully created!</span>)
   }
   editCourse = () => {
     let code = this.codeInputRef.state.value
@@ -155,14 +156,19 @@ export default class AllCourses extends React.Component {
     let cid = this.currentCourse
     data[cid] = Object.assign(data[cid], {code, name})
     this.toggleEdit()
+    message.success(<span>Course "<b>{code}</b> : {name}" successfully edited!</span>)
   }
   archiveCourse = () => {
+    let {code, name} = data[this.currentCourse]
     data[this.currentCourse].active = false
     this.toggleArchive()
+    message.success(<span>Course "<b>{code}</b> : {name}" successfully archived!</span>)
   }
   deleteCourse = () => {
+    let {code, name} = data[this.currentCourse]
     delete data[this.currentCourse]
     this.toggleDelete()
+    message.success(<span>Course "<b>{code}</b> : {name}" successfully deleted!</span>)
   }
 
   render(){
