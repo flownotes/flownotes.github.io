@@ -95,13 +95,99 @@ nav.all-courses-nav > span:hover {
   left: -5px;
 }
 
-/* 
-Dropdown UL style "ul.ant-dropdown-menu"
-pass it through props?
-{
-  
+.course-config-modal .ant-modal-content,
+.course-config-modal .ant-modal-header{
+  background-color: #fffff4;
 }
 
-// also add border-bottom to menu elements
-border-bottom: 1px solid lightgray;
-*/
+.course-config-modal .ant-modal-header{
+  border-bottom: 1px solid #d0d0d0;
+}
+
+.course-config-modal .ant-modal-footer{
+  border-top: 1px solid #d0d0d0;
+}
+
+.course-config-modal .ant-input{
+  margin-bottom: 2em;
+}
+
+.course-config-modal .label{
+  margin-bottom: 10px;
+  font-size: 16px;
+}
+
+.course-config-modal .ant-modal-title{
+  font-size: 2em;
+  text-align: center;
+  font-weight: 300;
+}
+
+.course-config-modal .archive-message,
+.course-config-modal .error-message {
+  text-align: center;
+}
+
+.course-config-modal .archive-message p,
+.course-config-modal .error-message p {
+  margin-bottom: 14px;
+  font-size: 16px;
+}
+
+.course-config-modal .archive-message h2,
+.course-config-modal .error-message h2 {
+  margin-bottom: 0px;
+}
+
+.course-config-modal .archive-message h3,
+.course-config-modal .error-message h3 {
+  margin-bottom: 10px;
+  color: #636363;
+}
+
+.course-config-modal .error-message span{
+  color: red;
+}
+
+.course-config-modal .title {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.course-config-modal .arch-icon {
+  color: gold;
+  margin-right: 1em;
+  font-size: 24px;
+}
+
+.course-config-modal .delt-icon {
+  color: red;
+  margin-right: 1em;
+  font-size: 24px;
+}
+/* 
+.course-config-modal .ant-collapse-content-box {
+  padding: 6px;
+} */
+
+/* Need to have high specificty for the following few :( - stupid antd*/
+.course-container .course-collapse.more-specificity .ant-collapse-header{
+  padding-left: 10px;
+  background: #f7f9fa;
+  margin-bottom: 1em;
+  border: 1px solid darkgray;
+  font-size: 16px;
+  font-weight: 500;
+  box-shadow: 0px 3px 5px -2px darkgrey;
+}
+
+.course-container .course-collapse.more-specificity
+.ant-collapse-item .ant-collapse-header .anticon {
+  font-size: 16px;
+}
+
+.course-container .course-collapse.more-specificity
+.ant-collapse-content > .ant-collapse-content-box{
+  padding: 6px;
+}
