@@ -2,7 +2,7 @@ import React from "react"
 import Logo from "./components/Logo"
 import { Select } from "antd"
 import { SearchOutlined } from '@ant-design/icons'
-import { withRouter, useHistory } from "react-router-dom";
+import { withRouter, useHistory } from "react-router-dom"
 import data from "./data"
 
 import "./AllVideos.css"
@@ -17,7 +17,8 @@ import "./AllVideos.css"
 class AllVideos extends React.Component {
   constructor(props){
     super(props)
-    this.filterTags = []
+    this.filterTags = [] // this is to keep track of as select changes
+    this.state = {filterTags: []} // this is to trigger render when 
   }
 
   goToHome = () => this.props.history.push("/")
@@ -27,18 +28,18 @@ class AllVideos extends React.Component {
     let videos = data[cid].videos
     let tagOptions = []
     let tags = {}
-
     videos.map(video =>
       video.notes.map(note =>
         note.tags.map(tag => tags[tag] = true)
       )
     )
-
     Object.keys(tags).map(tag => tagOptions.push({label:tag, value:tag}))
-
     return tagOptions
   }
 
+  // we only want to apply the values once the user is done selecting,
+  // hence only once the dropdown is gone, we update state and the view.
+  updateFilter = (e) => !e ? this.setState({filterTags:this.filterTags}) : null
 
   getNav = () => {
     const options = this.getTagsOpts()
@@ -53,6 +54,7 @@ class AllVideos extends React.Component {
         allowClear
         suffixIcon={<SearchOutlined style={{fontSize: "22px"}}/>}
         options={options}
+        onDropdownVisibleChange={this.updateFilter}
         onChange={(tags) => this.filterTags = tags}
       >
       </Select>
@@ -61,6 +63,7 @@ class AllVideos extends React.Component {
 
   render(){
     let cid = this.props.match.params["courseId"]
+    const {filterTags} = this.state
     const course = data[cid]
     const videos = course.videos
     return (
@@ -68,6 +71,9 @@ class AllVideos extends React.Component {
         {this.getNav()}
         <div className="video-container">
           <h2 className="course-title">{course.code}: {course.name}</h2>
+          {filterTags.length? 
+            <span>Currently *not* filtering by {filterTags.map(t => `"${t}" `)}</span>
+            : null}
           { videos.map(video => <Video key={video.id} video={video}/>)}
         </div>
       </div>
