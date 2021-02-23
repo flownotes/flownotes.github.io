@@ -10,6 +10,7 @@ import {
 
 import Home from "./Home"
 import AllCourses from "./AllCourses"
+import AllVideos from "./AllVideos"
 import "./App.css"
 
 export default function App() {
@@ -95,20 +96,20 @@ function NoMatch() {
 // }
 
 // URL = '/notes/courseId'
-function AllVideos(){
-  let { url } = useRouteMatch()
-  let { courseId } = useParams()
-  return (
-    <>
-    <div>List of videos for course : {courseId}</div>
-    <ul>
-      <li><Link to={`${url}/v1`}>Video 1</Link></li>
-      <li><Link to={`${url}/v2`}>Video 2</Link></li>
-      <li><Link to={`${url}/v3`}>Video 3</Link></li>
-    </ul>
-    </>
-  )
-}
+// function AllVideos(){
+//   let { url } = useRouteMatch()
+//   let { courseId } = useParams()
+//   return (
+//     <>
+//     <div>List of videos for course : {courseId}</div>
+//     <ul>
+//       <li><Link to={`${url}/v1`}>Video 1</Link></li>
+//       <li><Link to={`${url}/v2`}>Video 2</Link></li>
+//       <li><Link to={`${url}/v3`}>Video 3</Link></li>
+//     </ul>
+//     </>
+//   )
+// }
 
 // URL = '/notes/:courseId/:videoId'
 function CourseNotes() {
