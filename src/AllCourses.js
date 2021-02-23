@@ -3,51 +3,51 @@ import Logo from "./components/Logo"
 import { Dropdown, Menu, Modal, Input, Collapse, message } from "antd"
 import { PlusOutlined, SettingFilled, WarningFilled } from '@ant-design/icons'
 import { useHistory } from "react-router-dom";
-
+import data from "./data"
 import "./AllCourses.css"
 const { Panel } = Collapse;
 
 
 // generate some mock data to develop the components + interaction
 // for images just screen shot a few thumbnails, have them in /public or base64 embed
-let data = {
-  cid1 : {
-    code: "CSE 110",
-    name: "Software Engineering",
-    vcount: 14,
-    active: true
-  },
-  cid2 : {
-    code: "CSE 141",
-    name: "Introduction to Computer Architecture",
-    vcount: 12,
-    active: true
-  },
-  cid3 : {
-    code: "CSE 121",
-    name: "Systems Design",
-    vcount: 15,
-    active: true
-  },
-  cid4 : {
-    code: "CSE 101",
-    name: "Computational Thinking",
-    vcount: 9,
-    active: true
-  },
-  cid5 : {
-    code: "CSE 100",
-    name: "Basic CS stuff",
-    vcount: 15,
-    active: false
-  },
-  cid6 : {
-    code: "CSE 111",
-    name: "Web design and development",
-    vcount: 9,
-    active: false
-  },
-}
+// let data = {
+//   cid1 : {
+//     code: "CSE 110",
+//     name: "Software Engineering",
+//     vcount: 14,
+//     active: true
+//   },
+//   cid2 : {
+//     code: "CSE 141",
+//     name: "Introduction to Computer Architecture",
+//     vcount: 12,
+//     active: true
+//   },
+//   cid3 : {
+//     code: "CSE 121",
+//     name: "Systems Design",
+//     vcount: 15,
+//     active: true
+//   },
+//   cid4 : {
+//     code: "CSE 101",
+//     name: "Computational Thinking",
+//     vcount: 9,
+//     active: true
+//   },
+//   cid5 : {
+//     code: "CSE 100",
+//     name: "Basic CS stuff",
+//     vcount: 15,
+//     active: false
+//   },
+//   cid6 : {
+//     code: "CSE 111",
+//     name: "Web design and development",
+//     vcount: 9,
+//     active: false
+//   },
+// }
 
 export default class AllCourses extends React.Component {
   constructor(props){
@@ -205,7 +205,7 @@ export default class AllCourses extends React.Component {
                   className="course-collapse more-specificity">
           <Panel header="Active" key="1">
             { objs.filter(key => data[key].active)
-                  .map(key => <Course key={key} {...data[key]}
+                  .map(key => <Course key={key} cid={key}
                               onEdit={() => this.toggleEdit(key) }
                               onArchive={() => this.toggleArchive(key)}
                               onDelete={() => this.toggleDelete(key)} />
@@ -214,7 +214,7 @@ export default class AllCourses extends React.Component {
           </Panel>
           <Panel header="Archived" key="2">
             { objs.filter(key => !data[key].active)
-                  .map(key => <Course key={key} {...data[key]}
+                  .map(key => <Course key={key} cid={key}
                               onEdit={() => this.toggleEdit(key) }
                               onUnArchive={() => this.toggleUnArchive(key)}
                               onDelete={() => this.toggleDelete(key)} />
@@ -300,12 +300,12 @@ function Nav({onAddCourse}){
 
 // the card ui for a single course
 function Course(props){
-  const {name, code, vcount} = props
+  const {name, code, vcount} = data[props.cid]
   const {onEdit, onArchive, onDelete, onUnArchive} = props
 
   let history = useHistory()
   const goToCourse = () => {
-    history.push(`/notes/${code}`)
+    history.push(`/notes/${props.cid}`)
   }
 
   const menu = courseCardMenu({onEdit, onArchive, onDelete, onUnArchive})
