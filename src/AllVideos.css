@@ -9,6 +9,7 @@
 nav.all-videos-nav {
   display: flex;
   justify-content: space-between;
+  align-items: stretch;
   padding: 10px;
   background: #f7f9fa;
   box-shadow: 0px 1px 2px 0px darkgrey;
@@ -18,38 +19,36 @@ nav.all-videos-nav {
 nav.all-videos-nav img {
   /*without this img stretches*/
   flex-grow: 0;
-  margin-right: 20px;
+  margin-right: 10px;
 }
 
 nav.all-videos-nav .filter-tags {
   flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: stretch;
 }
 
-nav.all-videos-nav > p {
-  font-size: 24px;
-  margin-bottom: 0px;
-  font-weight: 300;
-  line-height: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+nav.all-videos-nav .filter-tags .ant-select-selector {
+  border-right: none;
+  flex: 1;
+  border-radius: 4px 0 0 4px;
 }
 
 nav.all-videos-nav > span {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 24px;
+  font-size: 22px;
   margin-bottom: 0px;
-  /* set width to match logo on the left
-  so that the title is centered */
   width: 36px;
+  background: lightgray;
+  border-radius: 0 4px 4px 0;
 }
 
 nav.all-videos-nav > span:hover {
   background: darkgrey;
   color: white;
-  border-radius: 7px;
 }
 
 .video-container .course-title {

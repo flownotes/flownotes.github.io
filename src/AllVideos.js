@@ -52,12 +52,12 @@ class AllVideos extends React.Component {
         placeholder="Search by tags"
         showSearch={true}
         allowClear
-        suffixIcon={<SearchOutlined style={{fontSize: "22px"}}/>}
         options={options}
         onDropdownVisibleChange={this.updateFilter}
         onChange={(tags) => this.filterTags = tags}
       >
       </Select>
+      <SearchOutlined style={{fontSize: "22px"}}/>
     </nav>
   )}
 
