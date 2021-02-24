@@ -11,6 +11,7 @@ import {
 import Home from "./Home"
 import AllCourses from "./AllCourses"
 import AllVideos from "./AllVideos"
+import VideoNotes from "./VideoNotes"
 import "./App.css"
 
 export default function App() {
@@ -39,7 +40,7 @@ export default function App() {
             <CourseNotes />
           </Route>
 
-          {/* Shows the list of courses the user has taken notes for */}
+          {/* Shows the note taking view for the video */}
           <Route path="/video/:videoId">
             <VideoNotes />
           </Route>
@@ -127,6 +128,6 @@ function CourseNotes() {
 }
 
 // URL = '/video/:videoId'
-function VideoNotes(){
-  return <div>You can take down notes here</div>
-}
+// function VideoNotes(){
+//   return <div>You can take down notes here</div>
+// }

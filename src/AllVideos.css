@@ -2,7 +2,7 @@
   min-height: 100vh;
 }
 
-.video-container {
+.videos-shell .video-container {
   padding: 10px;
 }
 
@@ -51,7 +51,7 @@ nav.all-videos-nav > span:hover {
   color: white;
 }
 
-.video-container .course-title {
+.videos-shell .video-container .course-title {
   margin: 10px 0 20px 0;
   font-size: 22px;
   font-weight: 400;
