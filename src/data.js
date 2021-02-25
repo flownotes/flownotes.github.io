@@ -45,42 +45,42 @@ let notes = [
 
 let videos = [
   {
-    id : "vid1",
+    id : "90QvQ3p6brk",
     title: "L15 - Software Engineering in practice",
     length: 48, //in min
     notes: JSON.parse(JSON.stringify(notes)),
     image: "/thumbnails/th1.jpg"
   },
   {
-    id : "vid2",
+    id : "LzELw8k1FEY",
     title: "L14 - Time management and estimation",
     length: 51, //in min
     notes: JSON.parse(JSON.stringify(notes)),
     image: "/thumbnails/th2.jpg"
   },
   {
-    id : "vid3",
+    id : "eRcAf69IdCk",
     title: "L13 - Agile and sprints",
     length: 48, //in min
     notes: JSON.parse(JSON.stringify(notes)),
     image: "/thumbnails/th3.jpg"
   },
   {
-    id : "vid4",
+    id : "TVpGb5Jj0GY",
     title: "L12 - Why your manager is wrong",
     length: 56, //in min
     notes: JSON.parse(JSON.stringify(notes)),
     image: "/thumbnails/th4.jpg"
   },
   {
-    id : "vid5",
+    id : "kzvt3g8pUHQ",
     title: "L11 - Version control and automation",
     length: 43, //in min
     notes: JSON.parse(JSON.stringify(notes)),
     image: "/thumbnails/th5.jpg"
   },
   {
-    id : "vid6",
+    id : "4NKaIclN2fk",
     title: "L10 - Software Engineering in practice",
     length: 58, //in min
     notes: JSON.parse(JSON.stringify(notes)),
@@ -92,7 +92,7 @@ let data = {
   cid1 : {
     code: "CSE 110",
     name: "Software Engineering",
-    vcount: 14,
+    vcount: 14, //TODO: this should go, update AllCourses
     active: true,
     videos: JSON.parse(JSON.stringify(videos))
   },
@@ -131,6 +131,15 @@ let data = {
     active: false,
     videos: JSON.parse(JSON.stringify(videos))
   },
+  unclassified : {
+    code: "Unclassified",
+    name: "Videos which belong to no class",
+    vcount: 0,
+    active: true,
+    videos: []
+  }
 }
 
 export default data
+
+window.data = data
