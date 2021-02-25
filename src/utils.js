@@ -2,7 +2,7 @@ export function randstr(){
     return Math.random().toString(36).replace('0.','')
 }
 
-export async function getVideoDetails(video_id) {
+export async function getYTDetails(video_id) {
   const decodeQueryString = (queryString) => {
     let key, keyValPair, keyValPairs, r, val, _i, _len
     r = {}
