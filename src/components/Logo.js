@@ -8,7 +8,8 @@ export default function Logo(props){
                           height:"100px",
                           background:"#1f1f1f",
                           borderRadius:"20%",
-                          padding: "7px"
+                          padding: "7px",
+                          cursor: "pointer"
                         }, style)
   return (
     <img className="logo"
