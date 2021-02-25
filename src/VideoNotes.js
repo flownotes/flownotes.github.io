@@ -130,20 +130,24 @@ class VideoNotes extends React.Component {
     let { lectureDetails, ytDetails:{url} } = this.state
     const vid = this.getVideoId()
     const loading = isEmpty(lectureDetails)
-    let courseDetails = getVideoCourse(vid)
+    let course = getVideoCourse(vid)
+    let notes = lectureDetails.notes
     return (
       <div className="notes-shell">
         {this.getNav()}
         <VideoPlayer url={url}/>
         {loading? this.getLoadingDOM() :
-        (<>
+        (<div className="notes-content-wrapper">
           <div className="lecture-details">
-            Lecture details
+            <h2 className="lecture-title">{lectureDetails.title}</h2>
+            <span className="lecture-course">{course.code} <b>·</b> {course.name}</span>
           </div>
           <div className="notes-container">
-            <p>List of notes come here</p>
+            {notes.map(note => <Note key={note.id} data={note}/>)}
+            {notes.length == 0? <div>Your notes go here! (not yet implemented)</div>:null}
           </div>
-        </>)}
+        </div>)}
+        {/* Footer comes here */}
       </div>
     )
   }
@@ -153,7 +157,25 @@ export default withRouter(VideoNotes)
 
 
 class Note extends React.Component {
-
+  render(){
+    const {tags, timestamp} = this.props.data
+    return (
+      <div className="note-item">
+        <div className="note-top">
+          {/* will have timestamp + edit */}
+          <div className="note-ts">{timestamp}</div>
+        </div>
+        <div className="note-content">
+        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque nec quam rhoncus
+        sapien posuere venenatis. Vestibulum mattis imperdiet mi a blandit. Fusce ullamcorper
+        ultricies dolor.
+        </div>
+        <div className="note-tags">
+          {tags.map(tag => <div className="note-tag" key={tag}>#{tag}</div>)}
+        </div>
+      </div>
+    )
+  }
 }
 
 class VideoPlayer extends React.Component{

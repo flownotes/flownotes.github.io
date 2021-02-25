@@ -1,11 +1,6 @@
-/* VideoNotes */
-.notes-shell{
-  min-height: 100vh;
-}
-
-.notes-container {
-  padding: 10px;
-}
+/**********************
+      Navigation      
+**********************/
 
 .notes-nav {
   display: flex;
@@ -26,8 +21,79 @@
   width: 36px;
 }
 
+/**********************
+      Notes Stuff      
+**********************/
 
-/* VideoPlayer */
+.notes-shell{
+  min-height: 100vh;
+}
+
+.notes-shell .notes-content-wrapper {
+
+}
+
+.notes-shell .lecture-details {
+  padding : 14px 10px;
+  border-bottom: 1px solid #7b795f;
+}
+
+.notes-shell .lecture-details .lecture-title{
+  font-size: 18px;
+  font-weight: 400;
+}
+
+.notes-shell .lecture-details .lecture-course{
+  font-size: 16px;
+  color: gray;
+  font-weight: 500;
+}
+
+.notes-shell .notes-container {
+  padding: 10px 5px;
+}
+
+.notes-shell .note-item {
+  padding: 10px;
+  margin-bottom: 1.75em;
+  border: 1px solid darkgrey;
+  background: #f7f9fa;
+  box-shadow: 0px 0px 4px 0px darkgrey;
+}
+.note-item .note-top {
+  margin-bottom: 10px;
+}
+.note-item .note-ts {
+  background: #3f3f3f;
+  padding: 0px 4px;
+  font-weight: 400;
+  font-size: 16px;
+  border-radius: 4px;
+  display: inline-block;
+  border: 1px solid gray;
+  color: white;
+}
+
+.note-item .note-content {
+  margin: 10px 2px;
+}
+
+.note-item .note-tags {
+}
+.note-item .note-tag {
+  display: inline-block;
+  margin-right: 10px;
+  background: #92c7ff;
+  padding: 2px 8px;
+  font-weight: 300;
+  font-size: 12px;
+  border-radius: 10px;
+}
+
+/*********************
+      VideoPlayer     
+**********************/
+
 .video-player {
   width: 100%;
 }
