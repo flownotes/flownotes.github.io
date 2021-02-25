@@ -2,6 +2,15 @@ export function randstr(){
     return Math.random().toString(36).replace('0.','')
 }
 
+export function isEmpty(obj){
+    return obj && Object.keys(obj).length === 0 && obj.constructor === Object
+}
+
+//takes in time in ms, returns rounded up in min
+export function msToMins(ms) {
+  return Math.round(ms/(1000*60))
+}
+
 export async function getYTDetails(video_id) {
   const decodeQueryString = (queryString) => {
     let key, keyValPair, keyValPairs, r, val, _i, _len

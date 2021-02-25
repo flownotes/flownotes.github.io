@@ -1,11 +1,11 @@
 import React from "react"
 import { withRouter } from "react-router-dom"
-import { Spin } from "antd"
+import { Spin, Skeleton } from "antd"
 import { SearchOutlined } from '@ant-design/icons'
 
 import Logo from "./components/Logo"
 
-import { getYTDetails, randstr } from "./utils"
+import { getYTDetails, isEmpty, msToMins } from "./utils"
 import data from "./data"
 
 import "./VideoNotes.css"
@@ -29,6 +29,7 @@ import "./VideoNotes.css"
 
   FINAL : later on if we have time
     1. Have our own backend (firebase function) which gets the url
+        This will give us title, thumbnail and description?
     2. Reconsider auto-create for new videos
 
   There were a bunch of other considerations -
@@ -54,26 +55,43 @@ function getVideoDetails(vid){
       break
     }
   }
-  // this returns the video object, but with cid included
-  return found? {cid, ...video} : {}
+  return found? video : {}
 }
 
-// create a new video and adds it to data
-function createVideo(vid){
-  let video = {vid, length:10, notes:[], }
+function getVideoCourse(vid){
+  let cid, video, found = false
+  for(cid in data){
+    video = data[cid].videos.find(video => video.id === vid)
+    if (video) {
+      found = true
+      break
+    }
+  }
+  // this returns the cid
+  if (found){
+    return {cid, ...data[cid]}
+  }
+  return {cid:"unclassified"}
+}
 
+
+// create a new video and adds it to data
+function createVideoEntry(cid, lectureDetails){
+  // were pushing the lecture directly, any changes
+  // we make to it should also reflect on 'data'
+  data[cid].videos.push(lectureDetails)
 }
 
 function editVideoDetails(){
-
+  // need to call explicit render after this
 }
 
 class VideoNotes extends React.Component {
   constructor(props){
     super(props)
     this.state = {
-      mediaDetails: {}, //remote data - url
-      lectureDetails: {} //data[cid].videos[vid]
+      ytDetails: {}, //remote data - url
+      lectureDetails: {}, //data[cid].videos[vid]
     }
   }
 
@@ -91,27 +109,41 @@ class VideoNotes extends React.Component {
 
   componentDidMount() {
     const vid = this.getVideoId()
-    console.log(getVideoDetails(vid))
-    // incase video doesn't exist, I need to create a new entry
+    // get the details
+    let lecture = getVideoDetails(vid)
+
+    // get the media details
+    getYTDetails(vid).then(data => {
+      if(isEmpty(lecture)){
+        // create a lecture entry with defaults
+        let length = msToMins(parseInt(data["approxDurationMs"]) || 0)
+        lecture = {id:vid, title:"Title", notes:[], image:"/thumbnails/th1.jpg", length}
+        createVideoEntry("unclassified", lecture)
+      }
+      this.setState({ytDetails:data, lectureDetails:lecture})
+    })
   }
 
-  getPlayerDOM = () => {
-    const vid = this.getVideoId()
-    console.log(getVideoDetails(vid))
-    return (
-      <VideoPlayer vid={vid}/>
-      // title and class dropdown come here?
-    )
-  }
+  getLoadingDOM = () => <Skeleton active/>
 
   render(){
+    let { lectureDetails, ytDetails:{url} } = this.state
+    const vid = this.getVideoId()
+    const loading = isEmpty(lectureDetails)
+    let courseDetails = getVideoCourse(vid)
     return (
       <div className="notes-shell">
         {this.getNav()}
-        {this.getPlayerDOM()}
-        <div className="notes-container">
-          <p>List of notes come here</p>
-        </div>
+        <VideoPlayer url={url}/>
+        {loading? this.getLoadingDOM() :
+        (<>
+          <div className="lecture-details">
+            Lecture details
+          </div>
+          <div className="notes-container">
+            <p>List of notes come here</p>
+          </div>
+        </>)}
       </div>
     )
   }
@@ -152,15 +184,14 @@ class VideoPlayer extends React.Component{
     this.observer = new ResizeObserver(() => {
       let el = this.player.current
       if(el && (el.offsetWidth != this.state.width)){
-        console.log("obs")
         this.setState({width: this.player.current.offsetWidth})
       }
     })
     this.observer.observe(this.player.current)
 
     // trigger the getYTDetails
-    const {vid} = this.props
-    getYTDetails(vid).then(data => this.setState({video:data}))
+    // const {vid} = this.props
+    // getYTDetails(vid).then(data => this.setState({video:data}))
 
     // setState the current width
     this.setState({
@@ -169,7 +200,7 @@ class VideoPlayer extends React.Component{
   }
 
   getVideoDOM = () => {
-    const src = this.state.video && this.state.video.url || ""
+    const src = this.props.url || ""
     const height = `${this.state.width * (9/16)}px`
     return <video id='vid' controls src={src} style={{height}}/>
   }
@@ -179,8 +210,9 @@ class VideoPlayer extends React.Component{
   }
 
   render(){
-    const { width, video } = this.state
-    const content = video? this.getVideoDOM() : this.getLoadingDOM()
+    const { width } = this.state
+    const { url } = this.props
+    const content = url? this.getVideoDOM() : this.getLoadingDOM()
     const height = `${this.state.width * (9/16)}px`
     return (
       <div className="video-player" ref={this.player} >
