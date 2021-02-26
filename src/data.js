@@ -1,44 +1,44 @@
 let notes = [
   {
     "id":"nid1",
-    "timestamp":"03:10",
-    "content":"",
+    "timestamp":190,
+    "content":"Test content",
     "tags":[ "git", "html", "vcs"]
   },
   {
     "id":"nid2",
-    "timestamp":"04:15",
-    "content":"",
+    "timestamp":255,
+    "content":"Test content",
     "tags":[ "exam", "logistics"]
   },
   {
     "id":"nid3",
-    "timestamp":"07:21",
-    "content":"",
+    "timestamp":441,
+    "content":"Test content",
     "tags":["web","animation","git"]
   },
   {
     "id":"nid4",
-    "timestamp":"09:50",
-    "content":"",
+    "timestamp":590,
+    "content":"Test content",
     "tags":["css","js","design"]
   },
   {
     "id":"nid5",
-    "timestamp":"11:10",
-    "content":"",
+    "timestamp":681,
+    "content":"Test content",
     "tags":["exam"]
   },
   {
     "id":"nid6",
-    "timestamp":"18:41",
-    "content":"",
+    "timestamp":1220,
+    "content":"Test content",
     "tags":["web","html","js"]
   },
   {
     "id":"nid7",
-    "timestamp":"19:93",
-    "content":"",
+    "timestamp":1554,
+    "content":"Test content",
     "tags":["design","web","exam"]
   }
 ]

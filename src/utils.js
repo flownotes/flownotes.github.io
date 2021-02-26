@@ -11,6 +11,26 @@ export function msToMins(ms) {
   return Math.round(ms/(1000*60))
 }
 
+//takes in seconds, returns hh:mm:ss
+export function secToStr(sec){
+  let hr = Math.floor(sec / (60*60))
+  sec = sec % (60*60)
+  let min = Math.floor(sec / 60)
+  sec = sec % 60
+
+  let hs = hr > 0 ? hr.toString().padStart(2, '0')+":" : ""
+  let ms = min.toString().padStart(2,0)+":"
+  let ss = sec.toString().padStart(2,0)
+  return `${hs}${ms}${ss}`
+}
+
+//takes in hh:mm:ss, returns total seconds
+export function strToSec(str){
+  let time = str.split(":").map(e => parseInt(e))
+  let sec = time.length == 3? time[0]*3600 + time[1]*60 + time[2] : time[0]*60 + time[1]
+  return sec
+}
+
 export async function getYTDetails(video_id) {
   const decodeQueryString = (queryString) => {
     let key, keyValPair, keyValPairs, r, val, _i, _len

@@ -101,6 +101,47 @@
   border: 1px solid goldenrod;
 }
 
+/* EDITING stuff */
+
+.note-item .note-top-edit {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 15px;
+}
+.note-item .note-top-edit .ant-picker{
+  max-width: 80px;
+  padding-left: 7px;
+  padding-right: 7px;
+}
+
+.note-item .note-top-edit .ant-picker .ant-picker-suffix,
+.note-item .note-top-edit .ant-picker .ant-picker-clear{
+  display: none;
+}
+
+
+.note-item .note-content-edit {
+  margin-bottom: 15px;
+}
+
+.note-item .note-tags-edit {
+  display: flex;
+  align-items: center;
+}
+.note-item .note-tags-edit .ant-select {
+  min-width: 120px;
+}
+.note-item .note-tags-edit .ant-select-selector {
+  padding-right: 22px;
+}
+.note-item .note-tags-edit .anticon.anticon-plus {
+  position: relative;
+  left: -22px;
+  pointer-events: none;
+}
+
+
+
 /*********************
       VideoPlayer     
 **********************/
