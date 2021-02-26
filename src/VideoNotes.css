@@ -62,6 +62,9 @@
 }
 .note-item .note-top {
   margin-bottom: 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 .note-item .note-ts {
   background: #1f1f1f;
@@ -69,11 +72,16 @@
   font-weight: 400;
   font-size: 16px;
   border-radius: 4px;
-  display: inline-block;
   border: 1px solid gray;
   color: #1890ff;
   cursor: pointer;
   text-decoration: underline;
+}
+
+.note-item .note-edit .anticon{
+  font-size: 18px;
+  padding: 5px;
+  cursor: pointer;
 }
 
 .note-item .note-content {
