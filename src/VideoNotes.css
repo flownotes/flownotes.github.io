@@ -64,14 +64,16 @@
   margin-bottom: 10px;
 }
 .note-item .note-ts {
-  background: #3f3f3f;
+  background: #1f1f1f;
   padding: 0px 4px;
   font-weight: 400;
   font-size: 16px;
   border-radius: 4px;
   display: inline-block;
   border: 1px solid gray;
-  color: white;
+  color: #1890ff;
+  cursor: pointer;
+  text-decoration: underline;
 }
 
 .note-item .note-content {
@@ -83,11 +85,12 @@
 .note-item .note-tag {
   display: inline-block;
   margin-right: 10px;
-  background: #92c7ff;
+  background: #fbff66;
   padding: 2px 8px;
-  font-weight: 300;
+  font-weight: 400;
   font-size: 12px;
   border-radius: 10px;
+  border: 1px solid goldenrod;
 }
 
 /*********************
