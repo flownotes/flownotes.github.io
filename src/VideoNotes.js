@@ -1,7 +1,7 @@
 import React from "react"
 import { withRouter } from "react-router-dom"
-import { Spin, Skeleton } from "antd"
-import { SearchOutlined } from '@ant-design/icons'
+import { Spin, Skeleton, Dropdown, Modal, Menu, message } from "antd"
+import { SearchOutlined, SettingFilled } from '@ant-design/icons'
 
 import Logo from "./components/Logo"
 
@@ -67,13 +67,11 @@ function getVideoCourse(vid){
       break
     }
   }
-  // this returns the cid
   if (found){
     return {cid, ...data[cid]}
   }
   return {cid:"unclassified"}
 }
-
 
 // create a new video and adds it to data
 function createVideoEntry(cid, lectureDetails){
@@ -82,9 +80,14 @@ function createVideoEntry(cid, lectureDetails){
   data[cid].videos.push(lectureDetails)
 }
 
-function editVideoDetails(){
-  // need to call explicit render after this
+// replace the entry in data[cid].videos array where video.id = vid
+function editVideoDetails(videoDetails){
+  let course = getVideoCourse(videoDetails.id)
+  let uIndex = course.videos.findIndex((video) => video.id == videoDetails.id)
+  course.videos[uIndex] = videoDetails
 }
+
+
 
 class VideoNotes extends React.Component {
   constructor(props){
@@ -92,6 +95,7 @@ class VideoNotes extends React.Component {
     this.state = {
       ytDetails: {}, //remote data - url
       lectureDetails: {}, //data[cid].videos[vid]
+      edit: null //nid of note being edited
     }
   }
 
@@ -124,10 +128,23 @@ class VideoNotes extends React.Component {
     })
   }
 
+  onNoteEditing = (nid) => this.setState({edit: nid})
+
+  onNoteEdited = (info) => console.log(info) //info note-obj
+
+  onNoteDeleted = (nid) => {
+    let lecture = this.state.lectureDetails
+    let notes = lecture.notes.filter(note => note.id !== nid)
+    let newLecture = {...lecture, notes:notes}
+    editVideoDetails(newLecture)
+    this.setState({lectureDetails: newLecture})
+    message.success("Note successfuly deleted!")
+  }
+
   getLoadingDOM = () => <Skeleton active/>
 
   render(){
-    let { lectureDetails, ytDetails:{url} } = this.state
+    let { lectureDetails, ytDetails:{url} , edit} = this.state
     const vid = this.getVideoId()
     const loading = isEmpty(lectureDetails)
     let course = getVideoCourse(vid)
@@ -143,8 +160,15 @@ class VideoNotes extends React.Component {
             <span className="lecture-course">{course.code} <b>·</b> {course.name}</span>
           </div>
           <div className="notes-container">
-            {notes.map(note => <Note key={note.id} data={note}/>)}
-            {notes.length == 0? <div style={{margin:"14px"}}>Your notes go here! (not yet implemented)</div>:null}
+            {notes.map(note => (
+                  <Note
+                    key={note.id}
+                    data={note}
+                    editMode={edit == note.id}
+                    onEditing={() => this.onNoteEditing(note.id)}
+                    onDeleted={() => this.onNoteDeleted(note.id)}
+                  />)
+            )}
           </div>
         </div>)}
         {/* Footer comes here */}
@@ -164,13 +188,51 @@ class Note extends React.Component {
     // bad practice ¯\_(ツ)_/¯
     document.querySelector("#vid").currentTime = sec
   }
+
+  onEditing = () => {
+    this.props.onEditing()
+  }
+  onDeleteing = () => {
+    Modal.confirm({
+      title:"Are you sure you want to delete this note?",
+      okText:"Delete",
+      cancelText:"No, keep",
+      okType:"danger",
+      onOk:this.props.onDeleted
+    })
+  }
+
+  // on edit: tell parent note 'id' is under edit, parent will update state => props.
+  // on edit complete: tell parent {nid: new data}, parent will update state => props.
+  // on delete complete : ask parent to delete note. parent will update state => props.
+  getEditMenu = () => (
+    <Menu onClick={(e) => e.domEvent.stopPropagation()}>
+      <Menu.Item onClick={this.props.onNoteEditing}>
+        Edit Note
+      </Menu.Item>
+      <Menu.Divider />
+      <Menu.Item danger onClick={this.onDeleteing}>
+        Delete Note
+      </Menu.Item>
+    </Menu>
+  )
+
   render(){
     const {tags, timestamp} = this.props.data
     return (
       <div className="note-item">
         <div className="note-top">
-          {/* will have timestamp + edit */}
           <div className="note-ts" onClick={()=>this.onTimestamp(timestamp)}>{timestamp}</div>
+          <div class="note-edit">
+            <Dropdown 
+              overlay={this.getEditMenu()}
+              trigger={['click']}
+              placement="bottomRight" 
+              overlayClassName="note-item-edit"
+            >
+              <SettingFilled onClick={e => e.stopPropagation()} />
+            </Dropdown>
+          </div>
         </div>
         <div className="note-content">
         Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque nec quam rhoncus
@@ -217,10 +279,6 @@ class VideoPlayer extends React.Component{
       }
     })
     this.observer.observe(this.player.current)
-
-    // trigger the getYTDetails
-    // const {vid} = this.props
-    // getYTDetails(vid).then(data => this.setState({video:data}))
 
     // setState the current width
     this.setState({
