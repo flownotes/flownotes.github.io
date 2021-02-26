@@ -1,14 +1,16 @@
 import React from "react"
 import { withRouter } from "react-router-dom"
-import { Spin, Skeleton, Dropdown, Modal, Menu, message } from "antd"
-import { SearchOutlined, SettingFilled } from '@ant-design/icons'
+import { Spin, Skeleton, Dropdown, Modal, Select,
+         Menu, message, TimePicker, Button, Input } from "antd"
+import { SearchOutlined, SettingFilled, PlusOutlined } from '@ant-design/icons'
+import moment from 'moment'
 
 import Logo from "./components/Logo"
-
-import { getYTDetails, isEmpty, msToMins } from "./utils"
+import { getYTDetails, isEmpty, msToMins, secToStr, strToSec } from "./utils"
 import data from "./data"
 
 import "./VideoNotes.css"
+const { TextArea } = Input
 
 /* LOGIC + Dataflow
   CURRENT : We have two different scenarios -
@@ -80,6 +82,20 @@ function createVideoEntry(cid, lectureDetails){
   data[cid].videos.push(lectureDetails)
 }
 
+// get's all the unique tags for a course in options format
+function getTagsOpts(cid) {
+  let videos = data[cid].videos
+  let tagOptions = []
+  let tags = {}
+  videos.map(video =>
+    video.notes.map(note =>
+      note.tags.map(tag => tags[tag] = true)
+    )
+  )
+  Object.keys(tags).map(tag => tagOptions.push({label:tag, value:tag}))
+  return tagOptions
+}
+
 // replace the entry in data[cid].videos array where video.id = vid
 function editVideoDetails(videoDetails){
   let course = getVideoCourse(videoDetails.id)
@@ -128,9 +144,30 @@ class VideoNotes extends React.Component {
     })
   }
 
-  onNoteEditing = (nid) => this.setState({edit: nid})
+  onNoteEditing = (nid) => {
+    this.setState({edit: nid})
+  }
 
-  onNoteEdited = (info) => console.log(info) //info note-obj
+  onNoteEdited = (update, newNote) => {
+    if(update){
+      let notes = this.state.lectureDetails.notes
+      let i = notes.findIndex(note => note.id === newNote.id)
+      notes[i] = newNote
+      notes.sort((n1, n2) => n1.timestamp - n2.timestamp)
+      /* bad practice ¯\_(ツ)_/¯
+      // I should actually update lectureDetails, but this works?
+      // I'm actually supposed to do what I did in "onNoteDeleted"
+        newNotes = [...notes]
+        newLecture = {...lecture, notes:newNotes}
+        editVideoDetails(newLecture)
+        this.setState({lectureDetails: newLecture})
+       */
+
+    }
+    this.setState({edit:null})
+    if (update)
+      message.success(`Note "${secToStr(newNote.timestamp)}" successfully edited!`)
+  }
 
   onNoteDeleted = (nid) => {
     let lecture = this.state.lectureDetails
@@ -138,7 +175,7 @@ class VideoNotes extends React.Component {
     let newLecture = {...lecture, notes:notes}
     editVideoDetails(newLecture)
     this.setState({lectureDetails: newLecture})
-    message.success("Note successfuly deleted!")
+    message.success("Note successfully deleted!")
   }
 
   getLoadingDOM = () => <Skeleton active/>
@@ -164,9 +201,12 @@ class VideoNotes extends React.Component {
                   <Note
                     key={note.id}
                     data={note}
+                    vid={vid}
                     editMode={edit == note.id}
+                    editable={edit? false:true}
                     onEditing={() => this.onNoteEditing(note.id)}
                     onDeleted={() => this.onNoteDeleted(note.id)}
+                    onEdited={this.onNoteEdited}
                   />)
             )}
           </div>
@@ -181,10 +221,12 @@ export default withRouter(VideoNotes)
 
 
 class Note extends React.Component {
-  onTimestamp = (ts) => {
-    let time = ts.split(":").map(e => parseInt(e))
-    let sec = time[0]*60 + time[1] // in sec
+  constructor(props){
+    super(props)
+    this.editData = {} //props.data being edited
+  }
 
+  onTimestamp = (sec) => {
     // bad practice ¯\_(ツ)_/¯
     document.querySelector("#vid").currentTime = sec
   }
@@ -207,7 +249,7 @@ class Note extends React.Component {
   // on delete complete : ask parent to delete note. parent will update state => props.
   getEditMenu = () => (
     <Menu onClick={(e) => e.domEvent.stopPropagation()}>
-      <Menu.Item onClick={this.props.onNoteEditing}>
+      <Menu.Item onClick={this.props.onEditing}>
         Edit Note
       </Menu.Item>
       <Menu.Divider />
@@ -217,34 +259,103 @@ class Note extends React.Component {
     </Menu>
   )
 
+  onDone = (update) => {
+    if(update){
+      let newNote = {...this.props.data, ...this.editData}
+      this.props.onEdited(update, newNote)
+    }
+    else {
+      this.props.onEdited(update, null)
+    }
+  }
+
+  timeUpdated = (_, timeStr) => this.editData.timestamp = strToSec(timeStr)
+  contentUpdated = (e) => this.editData.content = e.target.value
+
+  getEditBody = () => {
+    let {timestamp, content, tags} = this.props.data
+    
+    // get moment object for default HH:mm:ss - tricky to deal with the formats
+    let timeFormat = timestamp >= 3600 ? "hh:mm:ss" : "mm:ss"
+    let defaultTime = moment(secToStr(timestamp), timeFormat)
+    // save and discard button
+    let buttons = (
+            <div>
+              <Button danger onClick={()=>this.onDone(false)} style={{marginRight: "10px"}}>
+                Discard
+              </Button>
+              <Button type="primary" onClick={()=>this.onDone(true)}>
+                Save
+              </Button>
+            </div>
+    )
+
+    let {cid} = getVideoCourse(this.props.vid)
+    let options = getTagsOpts(cid)
+
+    return (
+    <>
+      <div className="note-top-edit">
+        <TimePicker defaultValue={defaultTime} format={timeFormat} 
+                    showNow={false} onChange={this.timeUpdated} 
+        />
+        {buttons}
+      </div>
+      <div className="note-content-edit">
+        <TextArea rows={3} defaultValue={content?content:""} onChange={this.contentUpdated}/>
+      </div>
+      <div className="note-tags-edit">
+        <Select 
+          mode="tags" 
+          className="edit-tags"
+          placeholder="add tags"
+          showSearch={true}
+          options={options}
+          defaultValue={tags}
+          onChange={(tags) => this.editData.tags = tags}
+        >
+        </Select>
+        <PlusOutlined />
+      </div>
+    </>
+    )
+  }
+
   render(){
-    const {tags, timestamp} = this.props.data
+    // editMode => is this note being edited, show the edit interface
+    // editable => if any other note is being edited don't show edit icon
+    const {editMode, editable} = this.props
+    const {tags, timestamp, content=""} = this.props.data
+
     return (
       <div className="note-item">
-        <div className="note-top">
-          <div className="note-ts" onClick={()=>this.onTimestamp(timestamp)}>{timestamp}</div>
-          <div class="note-edit">
-            <Dropdown 
-              overlay={this.getEditMenu()}
-              trigger={['click']}
-              placement="bottomRight" 
-              overlayClassName="note-item-edit"
-            >
-              <SettingFilled onClick={e => e.stopPropagation()} />
-            </Dropdown>
+        {editMode? this.getEditBody() :
+        (<>
+          <div className="note-top">
+            <div className="note-ts" onClick={()=>this.onTimestamp(timestamp)}>{secToStr(timestamp)}</div>
+            <div className="note-edit" style={editable? {}: {display:"none"}}>
+              <Dropdown 
+                overlay={this.getEditMenu()}
+                trigger={['click']}
+                placement="bottomRight" 
+                overlayClassName="note-item-edit"
+              >
+                <SettingFilled onClick={e => e.stopPropagation()} />
+              </Dropdown>
+            </div>
           </div>
-        </div>
-        <div className="note-content">
-        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque nec quam rhoncus
-        sapien posuere venenatis. Vestibulum mattis imperdiet mi a blandit. Fusce ullamcorper
-        ultricies dolor.
-        </div>
-        <div className="note-tags">
-          {tags.map(tag => <div className="note-tag" key={tag}>#{tag}</div>)}
-        </div>
+          <div className="note-content">
+            {content}
+          </div>
+          <div className="note-tags">
+            {tags.map(tag => <div className="note-tag" key={tag}>#{tag}</div>)}
+          </div>
+        </>)
+        }
       </div>
     )
   }
+
 }
 
 class VideoPlayer extends React.Component{
