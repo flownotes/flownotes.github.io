@@ -144,7 +144,7 @@ class VideoNotes extends React.Component {
           </div>
           <div className="notes-container">
             {notes.map(note => <Note key={note.id} data={note}/>)}
-            {notes.length == 0? <div>Your notes go here! (not yet implemented)</div>:null}
+            {notes.length == 0? <div style={{margin:"14px"}}>Your notes go here! (not yet implemented)</div>:null}
           </div>
         </div>)}
         {/* Footer comes here */}
@@ -157,13 +157,20 @@ export default withRouter(VideoNotes)
 
 
 class Note extends React.Component {
+  onTimestamp = (ts) => {
+    let time = ts.split(":").map(e => parseInt(e))
+    let sec = time[0]*60 + time[1] // in sec
+
+    // bad practice ¯\_(ツ)_/¯
+    document.querySelector("#vid").currentTime = sec
+  }
   render(){
     const {tags, timestamp} = this.props.data
     return (
       <div className="note-item">
         <div className="note-top">
           {/* will have timestamp + edit */}
-          <div className="note-ts">{timestamp}</div>
+          <div className="note-ts" onClick={()=>this.onTimestamp(timestamp)}>{timestamp}</div>
         </div>
         <div className="note-content">
         Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque nec quam rhoncus
