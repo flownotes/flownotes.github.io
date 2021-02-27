@@ -36,11 +36,15 @@
 .notes-shell .lecture-details {
   padding : 14px 10px;
   border-bottom: 1px solid #7b795f;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
 }
 
 .notes-shell .lecture-details .lecture-title{
   font-size: 18px;
   font-weight: 400;
+  margin-bottom: 5px;
 }
 
 .notes-shell .lecture-details .lecture-course{
@@ -141,6 +145,13 @@
 }
 
 
+.lecture-edit-modal .label{
+  margin-bottom: 7px;
+}
+
+.lecture-edit-modal .title-input{
+  margin-bottom: 20px;
+}
 
 /*********************
       VideoPlayer     

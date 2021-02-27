@@ -2,7 +2,7 @@ import React from "react"
 import { withRouter } from "react-router-dom"
 import { Spin, Skeleton, Dropdown, Modal, Select,
          Menu, message, TimePicker, Button, Input } from "antd"
-import { SearchOutlined, SettingFilled, PlusOutlined } from '@ant-design/icons'
+import { SearchOutlined, SettingFilled, PlusOutlined, EditOutlined } from '@ant-design/icons'
 import moment from 'moment'
 
 import Logo from "./components/Logo"
@@ -82,6 +82,17 @@ function createVideoEntry(cid, lectureDetails){
   data[cid].videos.push(lectureDetails)
 }
 
+// get's all the courses in options format
+function getCourseOpts(){
+  const cids = Object.keys(data)
+  let opts = []
+  for(let cid of cids){
+    let label = `${data[cid].code} : ${data[cid].name}`
+    opts.push({value:cid, label:label})
+  }
+  return opts
+}
+
 // get's all the unique tags for a course in options format
 function getTagsOpts(cid) {
   let videos = data[cid].videos
@@ -111,8 +122,10 @@ class VideoNotes extends React.Component {
     this.state = {
       ytDetails: {}, //remote data - url
       lectureDetails: {}, //data[cid].videos[vid]
-      edit: null //nid of note being edited
+      editingNote: null, //nid of note being edited
+      editingLecture: false, //whether I'm editing title & class of lecture
     }
+    this.tempEdits = {} //temp data to hold title & class edit details
   }
 
   goToHome = () => this.props.history.push("/")
@@ -145,7 +158,7 @@ class VideoNotes extends React.Component {
   }
 
   onNoteEditing = (nid) => {
-    this.setState({edit: nid})
+    this.setState({editingNote: nid})
   }
 
   onNoteEdited = (update, newNote) => {
@@ -164,7 +177,7 @@ class VideoNotes extends React.Component {
        */
 
     }
-    this.setState({edit:null})
+    this.setState({editingNote:null})
     if (update)
       message.success(`Note "${secToStr(newNote.timestamp)}" successfully edited!`)
   }
@@ -178,10 +191,65 @@ class VideoNotes extends React.Component {
     message.success("Note successfully deleted!")
   }
 
+  updateTitleClass = () => {
+    // update the title or class
+    let oldCid = getVideoCourse(this.getVideoId()).cid
+    if(this.tempEdits.class !== oldCid){
+      // remove video from old cid
+      data[oldCid].videos = data[oldCid].videos.filter(v => 
+                                              v.id !== this.getVideoId())
+
+      // move it into new cid
+      data[this.tempEdits.class].videos.push(this.state.lectureDetails)
+    }
+    if(this.tempEdits.title)
+      // bad practice ¯\_(ツ)_/¯
+      // should setState + update data with new obj
+      this.state.lectureDetails.title = this.tempEdits.title
+
+    this.setState({editingLecture:false})
+    this.tempEdits = {}
+  }
+
+  getTitleModal = () => {
+    let opts = getCourseOpts()
+    let {cid} = getVideoCourse(this.getVideoId())
+
+    return (
+      <Modal 
+        title="Edit lecture details"
+        visible={this.state.editingLecture}
+        okText="Update"
+        cancelText="Discard changes"
+        onCancel={() => {
+          this.setState({editingLecture:false})
+          this.tempEdits = {}
+        }}
+        onOk={this.updateTitleClass}
+        destroyOnClose
+        className="lecture-edit-modal"
+      >
+        <div className="lecture-edit-body">
+          <p className="label">Title</p>
+          <Input  placeholder="Lecture Title"
+                  className="title-input"
+                  defaultValue={this.state.lectureDetails.title}
+                  onChange={(e) => this.tempEdits.title = e.target.value}/>
+          <p className="label">Course</p>
+          <Select
+            defaultValue={cid}
+            options={opts}
+            onChange={(cid) => this.tempEdits.class = cid}>
+          </Select>
+        </div>
+      </Modal>
+    )
+  }
+
   getLoadingDOM = () => <Skeleton active/>
 
   render(){
-    let { lectureDetails, ytDetails:{url} , edit} = this.state
+    let { lectureDetails, ytDetails:{url} , editingNote} = this.state
     const vid = this.getVideoId()
     const loading = isEmpty(lectureDetails)
     let course = getVideoCourse(vid)
@@ -193,8 +261,15 @@ class VideoNotes extends React.Component {
         {loading? this.getLoadingDOM() :
         (<div className="notes-content-wrapper">
           <div className="lecture-details">
-            <h2 className="lecture-title">{lectureDetails.title}</h2>
-            <span className="lecture-course">{course.code} <b>·</b> {course.name}</span>
+            <div>
+              <h2 className="lecture-title">{lectureDetails.title}</h2>
+              <span className="lecture-course">{course.code} <b>·</b> {course.name}</span>
+            </div>
+            <EditOutlined 
+              style={{fontSize:"20px", padding:"0 10px", cursor:"pointer"}}
+              onClick={() => this.setState({editingLecture: true, tempEdits: {}})}
+            />
+            {this.getTitleModal()}
           </div>
           <div className="notes-container">
             {notes.map(note => (
@@ -202,8 +277,8 @@ class VideoNotes extends React.Component {
                     key={note.id}
                     data={note}
                     vid={vid}
-                    editMode={edit == note.id}
-                    editable={edit? false:true}
+                    editMode={editingNote == note.id}
+                    editable={editingNote? false:true}
                     onEditing={() => this.onNoteEditing(note.id)}
                     onDeleted={() => this.onNoteDeleted(note.id)}
                     onEdited={this.onNoteEdited}
@@ -267,6 +342,7 @@ class Note extends React.Component {
     else {
       this.props.onEdited(update, null)
     }
+    this.editData = {}
   }
 
   timeUpdated = (_, timeStr) => this.editData.timestamp = strToSec(timeStr)
