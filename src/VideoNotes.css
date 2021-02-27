@@ -153,12 +153,36 @@
   margin-bottom: 20px;
 }
 
+
+.notes-shell .notes-footer {
+  background: #3f3f3f;
+  color: white;
+  position: sticky;
+  bottom: 0px;
+  padding: 7px 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.notes-shell .notes-footer .anticon {
+  font-size: 22px;
+  color: white;
+  cursor: pointer;
+}
+
+
 /*********************
       VideoPlayer     
 **********************/
 
 .video-player {
   width: 100%;
+}
+
+.video-player.pinned {
+  position: sticky;
+  top: 0;
 }
 
 .notes-shell .video-container {

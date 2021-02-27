@@ -118,10 +118,10 @@ export async function getYTDetails(video_id) {
 //https://github.com/gurumukhi/youtube-screenshot
 export function captureScreenshot() {
     let canvas = document.createElement("canvas")
-    let video = document.querySelector("video")
+    let video = document.querySelector("#vid")
     let ctx = canvas.getContext("2d")
-    canvas.width = parseInt(video.style.width)
-    canvas.height = parseInt(video.style.height)
+    canvas.width = parseInt(video.offsetWidth)
+    canvas.height = parseInt(video.offsetHeight)
     ctx.drawImage(video, 0, 0, canvas.width, canvas.height)
     return canvas.toDataURL()
 }
