@@ -115,7 +115,10 @@ function editVideoDetails(videoDetails){
   course.videos[uIndex] = videoDetails
 }
 
-
+// checks if note has at least one tag of tags
+function noteHasTag(note, tags){
+  return tags.some(tag => note.tags.includes(tag))
+}
 
 class VideoNotes extends React.Component {
   constructor(props){
@@ -124,10 +127,13 @@ class VideoNotes extends React.Component {
       ytDetails: {}, //remote data - url
       lectureDetails: {}, //data[cid].videos[vid]
       editingNote: null, //nid of note being edited
+      newNote: false, //whether we're editing a newly create note (just after '+')
       editingLecture: false, //whether I'm editing title & class of lecture
+      search:[],
       pinned: true // is the video pinned?
     }
     this.tempEdits = {} //temp data to hold title & class edit details
+    this.filterTags = []
   }
 
   goToHome = () => this.props.history.push("/")
@@ -135,12 +141,37 @@ class VideoNotes extends React.Component {
   getVideoId = () => this.props.match.params["videoId"]
 
   getNav = () => {
+    let {cid} = getVideoCourse(this.getVideoId())
+    let options = getTagsOpts(cid)
     return (
     <nav className="notes-nav">
       <Logo style={{height: "36px", width:"36px", padding:"3px"}} onClick={this.goToHome}/>
-      <SearchOutlined style={{fontSize: "22px"}}/>
+      <div className="filter-select">
+        <Select 
+          mode="tags" 
+          className="filter-tags specificiy"
+          placeholder="Search by tags"
+          showSearch={true}
+          allowClear
+          options={options}
+          onDropdownVisibleChange={this.updateFilter}
+          onClear={this.clearFilter}
+          onChange={(tags) => this.filterTags = tags}
+        >
+        </Select>
+        <SearchOutlined style={{fontSize: "22px"}}/>
+      </div>
     </nav>
   )}
+
+  updateFilter = () => {
+    this.setState({search:this.filterTags})
+  }
+
+  clearFilter = () => {
+    this.filterTags = []
+    this.setState({search:this.filterTags})
+  }
 
   componentDidMount() {
     const vid = this.getVideoId()
@@ -207,13 +238,14 @@ class VideoNotes extends React.Component {
   updateTitleClass = () => {
     // update the title or class
     let oldCid = getVideoCourse(this.getVideoId()).cid
-    if(this.tempEdits.class !== oldCid){
+    let newCid = this.tempEdits.class
+    if(newCid && (newCid!== oldCid)){
       // remove video from old cid
       data[oldCid].videos = data[oldCid].videos.filter(v => 
                                               v.id !== this.getVideoId())
 
       // move it into new cid
-      data[this.tempEdits.class].videos.unshift(this.state.lectureDetails)
+      data[newCid].videos.unshift(this.state.lectureDetails)
     }
     if(this.tempEdits.title)
       // bad practice ¯\_(ツ)_/¯
@@ -262,11 +294,16 @@ class VideoNotes extends React.Component {
   getLoadingDOM = () => <Skeleton active/>
 
   render(){
-    let { lectureDetails, ytDetails:{url} , editingNote, pinned} = this.state
+    let { lectureDetails, ytDetails:{url} , editingNote, pinned, search} = this.state
     const vid = this.getVideoId()
     const loading = isEmpty(lectureDetails)
     let course = getVideoCourse(vid)
     let notes = lectureDetails.notes
+    if(search.length>0)
+      notes = notes.filter(note => noteHasTag(note,search))
+
+    // if a note is bring edited or if search is active, can't edit
+    const editable = (editingNote || search.length > 0) ? false : true
     return (
       <div className="notes-shell">
         {this.getNav()}
@@ -285,6 +322,14 @@ class VideoNotes extends React.Component {
             />
             {this.getTitleModal()}
           </div>
+          {
+            search.length > 0? <div className="search-results">You are currently searching for &nbsp;
+                    {search.map(s => <span className="s-tag" key={s}>{s}</span>)}
+                <br/>
+                <span style={{color:"gray"}}>To edit or create new notes, please clear the search.</span>
+            </div> 
+            : null
+          }
           <div className="notes-container">
             {notes.map(note => (
                   <Note
@@ -292,7 +337,7 @@ class VideoNotes extends React.Component {
                     data={note}
                     vid={vid}
                     editMode={editingNote == note.id}
-                    editable={editingNote? false:true}
+                    editable={editable}
                     onEditing={() => this.onNoteEditing(note.id)}
                     onDeleted={() => this.onNoteDeleted(note.id)}
                     onEdited={this.onNoteEdited}
@@ -302,8 +347,7 @@ class VideoNotes extends React.Component {
         </div>
         <div className="notes-footer">
           <div className="left-side">
-            <PlusOutlined onClick={this.onNoteAdded} style={{marginRight:"18px"}}/>
-            <CameraOutlined />
+          {editable? <PlusOutlined onClick={this.onNoteAdded} style={{marginRight:"18px"}}/> : null}
           </div>
           <div className="right-side">
           { pinned? <PushpinFilled onClick={() => this.setState({pinned:false})}/> :
