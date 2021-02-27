@@ -2,11 +2,12 @@ import React from "react"
 import { withRouter } from "react-router-dom"
 import { Spin, Skeleton, Dropdown, Modal, Select,
          Menu, message, TimePicker, Button, Input } from "antd"
-import { SearchOutlined, SettingFilled, PlusOutlined, EditOutlined } from '@ant-design/icons'
+import { SearchOutlined, SettingFilled, PlusOutlined, PushpinOutlined,
+         PushpinFilled, EditOutlined, CameraOutlined, } from '@ant-design/icons'
 import moment from 'moment'
 
 import Logo from "./components/Logo"
-import { getYTDetails, isEmpty, msToMins, secToStr, strToSec } from "./utils"
+import { getYTDetails, isEmpty, msToMins, secToStr, strToSec, randstr } from "./utils"
 import data from "./data"
 
 import "./VideoNotes.css"
@@ -124,6 +125,7 @@ class VideoNotes extends React.Component {
       lectureDetails: {}, //data[cid].videos[vid]
       editingNote: null, //nid of note being edited
       editingLecture: false, //whether I'm editing title & class of lecture
+      pinned: true // is the video pinned?
     }
     this.tempEdits = {} //temp data to hold title & class edit details
   }
@@ -191,6 +193,17 @@ class VideoNotes extends React.Component {
     message.success("Note successfully deleted!")
   }
 
+  onNoteAdded = () => {
+    let id = "nid-" + randstr()
+    let timestamp = Math.round(document.querySelector("#vid").currentTime)
+    let newNote = {id, timestamp, content:"", tags:[]}
+    let notes = this.state.lectureDetails.notes
+    notes.push(newNote)
+    notes.sort((n1, n2) => n1.timestamp - n2.timestamp)
+    this.setState({editingNote:id, pinned:false})
+    document.querySelector("#vid").pause()
+  }
+
   updateTitleClass = () => {
     // update the title or class
     let oldCid = getVideoCourse(this.getVideoId()).cid
@@ -200,7 +213,7 @@ class VideoNotes extends React.Component {
                                               v.id !== this.getVideoId())
 
       // move it into new cid
-      data[this.tempEdits.class].videos.push(this.state.lectureDetails)
+      data[this.tempEdits.class].videos.unshift(this.state.lectureDetails)
     }
     if(this.tempEdits.title)
       // bad practice ¯\_(ツ)_/¯
@@ -249,7 +262,7 @@ class VideoNotes extends React.Component {
   getLoadingDOM = () => <Skeleton active/>
 
   render(){
-    let { lectureDetails, ytDetails:{url} , editingNote} = this.state
+    let { lectureDetails, ytDetails:{url} , editingNote, pinned} = this.state
     const vid = this.getVideoId()
     const loading = isEmpty(lectureDetails)
     let course = getVideoCourse(vid)
@@ -257,9 +270,10 @@ class VideoNotes extends React.Component {
     return (
       <div className="notes-shell">
         {this.getNav()}
-        <VideoPlayer url={url}/>
+        <VideoPlayer url={url} pinned={pinned}/>
         {loading? this.getLoadingDOM() :
-        (<div className="notes-content-wrapper">
+        (<>
+        <div className="notes-content-wrapper">
           <div className="lecture-details">
             <div>
               <h2 className="lecture-title">{lectureDetails.title}</h2>
@@ -285,8 +299,18 @@ class VideoNotes extends React.Component {
                   />)
             )}
           </div>
-        </div>)}
-        {/* Footer comes here */}
+        </div>
+        <div className="notes-footer">
+          <div className="left-side">
+            <PlusOutlined onClick={this.onNoteAdded} style={{marginRight:"18px"}}/>
+            <CameraOutlined />
+          </div>
+          <div className="right-side">
+          { pinned? <PushpinFilled onClick={() => this.setState({pinned:false})}/> :
+                    <PushpinOutlined onClick={() => this.setState({pinned:true})}/> }
+          </div>
+        </div>
+        </>)}
       </div>
     )
   }
@@ -299,6 +323,17 @@ class Note extends React.Component {
   constructor(props){
     super(props)
     this.editData = {} //props.data being edited
+    this.note = React.createRef()
+  }
+
+  componentDidUpdate(oProps){
+    if(oProps.editMode != this.props.editMode)
+      this.note.current.scrollIntoView({behavior:"smooth", block:"center"})
+  }
+
+  componentDidMount(){
+    if(this.props.editMode == true)
+      this.note.current.scrollIntoView({behavior:"smooth", block:"center"})
   }
 
   onTimestamp = (sec) => {
@@ -404,7 +439,7 @@ class Note extends React.Component {
     const {tags, timestamp, content=""} = this.props.data
 
     return (
-      <div className="note-item">
+      <div className="note-item" ref={this.note}>
         {editMode? this.getEditBody() :
         (<>
           <div className="note-top">
@@ -476,7 +511,7 @@ class VideoPlayer extends React.Component{
   getVideoDOM = () => {
     const src = this.props.url || ""
     const height = `${this.state.width * (9/16)}px`
-    return <video id='vid' controls src={src} style={{height}}/>
+    return <video id='vid' controls src={src} style={{height}} />
   }
 
   getLoadingDOM = () => {
@@ -485,11 +520,12 @@ class VideoPlayer extends React.Component{
 
   render(){
     const { width } = this.state
-    const { url } = this.props
+    const { url, pinned } = this.props
     const content = url? this.getVideoDOM() : this.getLoadingDOM()
     const height = `${this.state.width * (9/16)}px`
+    const rootClass = pinned? "video-player pinned" : "video-player"
     return (
-      <div className="video-player" ref={this.player} >
+      <div className={rootClass} ref={this.player} >
        { width && 
         <div className="video-container" style={{height}}>
           {content}
