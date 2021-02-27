@@ -194,25 +194,24 @@ class VideoNotes extends React.Component {
     this.setState({editingNote: nid})
   }
 
-  onNoteEdited = (update, newNote) => {
+  onNoteEdited = (update, uNote) => {
     if(update){
       let notes = this.state.lectureDetails.notes
-      let i = notes.findIndex(note => note.id === newNote.id)
-      notes[i] = newNote
+      let i = notes.findIndex(note => note.id === uNote.id)
+      notes[i] = uNote
       notes.sort((n1, n2) => n1.timestamp - n2.timestamp)
       /* bad practice ¯\_(ツ)_/¯
       // I should actually update lectureDetails, but this works?
       // I'm actually supposed to do what I did in "onNoteDeleted"
-        newNotes = [...notes]
-        newLecture = {...lecture, notes:newNotes}
+        uNotes = [...notes]
+        uLecture = {...lecture, notes:uNotes}
         editVideoDetails(newLecture)
         this.setState({lectureDetails: newLecture})
        */
-
     }
-    this.setState({editingNote:null})
+    this.setState({editingNote:null, newNote:false})
     if (update)
-      message.success(`Note "${secToStr(newNote.timestamp)}" successfully edited!`)
+      message.success(`Note "${secToStr(uNote.timestamp)}" successfully edited!`)
   }
 
   onNoteDeleted = (nid) => {
@@ -220,7 +219,7 @@ class VideoNotes extends React.Component {
     let notes = lecture.notes.filter(note => note.id !== nid)
     let newLecture = {...lecture, notes:notes}
     editVideoDetails(newLecture)
-    this.setState({lectureDetails: newLecture})
+    this.setState({lectureDetails: newLecture, newNote:false, editingNote:null})
     message.success("Note successfully deleted!")
   }
 
@@ -231,7 +230,7 @@ class VideoNotes extends React.Component {
     let notes = this.state.lectureDetails.notes
     notes.push(newNote)
     notes.sort((n1, n2) => n1.timestamp - n2.timestamp)
-    this.setState({editingNote:id, pinned:false})
+    this.setState({editingNote:id, pinned:false, newNote:true})
     document.querySelector("#vid").pause()
   }
 
@@ -294,7 +293,8 @@ class VideoNotes extends React.Component {
   getLoadingDOM = () => <Skeleton active/>
 
   render(){
-    let { lectureDetails, ytDetails:{url} , editingNote, pinned, search} = this.state
+    let { lectureDetails, ytDetails:{url}, 
+          editingNote, pinned, search, newNote } = this.state
     const vid = this.getVideoId()
     const loading = isEmpty(lectureDetails)
     let course = getVideoCourse(vid)
@@ -338,6 +338,7 @@ class VideoNotes extends React.Component {
                     vid={vid}
                     editMode={editingNote == note.id}
                     editable={editable}
+                    newNote={newNote}
                     onEditing={() => this.onNoteEditing(note.id)}
                     onDeleted={() => this.onNoteDeleted(note.id)}
                     onEdited={this.onNoteEdited}
@@ -418,7 +419,12 @@ class Note extends React.Component {
       let newNote = {...this.props.data, ...this.editData}
       this.props.onEdited(update, newNote)
     }
-    else {
+    else if(this.props.newNote) {
+      // if this is a new note and you're "discarding" it,
+      // just delete it.
+      this.props.onDeleted()
+    }
+    else{
       this.props.onEdited(update, null)
     }
     this.editData = {}
@@ -429,6 +435,7 @@ class Note extends React.Component {
 
   getEditBody = () => {
     let {timestamp, content, tags} = this.props.data
+    const isNew = this.props.newNote
     
     // get moment object for default HH:mm:ss - tricky to deal with the formats
     let timeFormat = timestamp >= 3600 ? "hh:mm:ss" : "mm:ss"
@@ -440,7 +447,7 @@ class Note extends React.Component {
                 Discard
               </Button>
               <Button type="primary" onClick={()=>this.onDone(true)}>
-                Save
+                {isNew? "Create": "Save" }
               </Button>
             </div>
     )
