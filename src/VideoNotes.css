@@ -21,6 +21,35 @@
   width: 36px;
 }
 
+.notes-nav .filter-select {
+  flex:1;
+  padding: 10px;
+  padding: 0 10px;
+  display: flex;
+  align-items: center;
+}
+
+.notes-nav .filter-select .filter-tags {
+  min-width: 100%;
+}
+.notes-nav .filter-select .ant-select-selector{
+  border-radius: 5px;
+  padding-right: 45px;
+}
+
+.notes-nav .filter-select .anticon-search{
+  font-size: 20px;
+  position: relative;
+  left: -25px;
+  pointer-events: none;
+}
+
+.notes-nav .filter-select .ant-select-clear{
+  top: 40%;
+  right: 35px;
+  font-size: 16px;
+}
+
 /**********************
       Notes Stuff      
 **********************/
@@ -51,6 +80,23 @@
   font-size: 16px;
   color: gray;
   font-weight: 500;
+}
+
+.notes-shell .search-results {
+  margin: 15px 5px;
+  font-size: 16px;
+  background: ghostwhite;
+  padding: 7px;
+  border: 2px solid #79794f;
+}
+
+.notes-shell .search-results .s-tag {
+  padding: 3px;
+  border: 1px solid gold;
+  background: #fbff66;
+  margin-right: 7px;
+  border-radius: 7px;
+  font-size: 14px;
 }
 
 .notes-shell .notes-container {
@@ -178,6 +224,7 @@
 
 .video-player {
   width: 100%;
+  z-index: 999;
 }
 
 .video-player.pinned {
