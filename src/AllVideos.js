@@ -1,24 +1,31 @@
 import React from "react"
 import Logo from "./components/Logo"
-import { Select } from "antd"
+import { Select, Collapse } from "antd"
 import { SearchOutlined } from '@ant-design/icons'
 import { withRouter, useHistory } from "react-router-dom"
+import { secToStr } from "./utils"
 import data from "./data"
-
 import "./AllVideos.css"
 
-// For search + autocomplete
-// https://ant.design/components/auto-complete/#components-auto-complete-demo-certain-category
-// What I can do is "enter text or # for tags", i.e. user can either search by text or by tag
-// I can show dropdown when user starts the search with "#" but still doesn't solve search - 
-// when to search text vs tags? how to search text? above UI doesn't solve multiple tags.
-// *** one option is to have a switch between text and tags ***
+
+const { Panel } = Collapse;
+function filterNotesByTags(notes, tags){
+  return notes.filter(note => tags.some(tag => note.tags.includes(tag)))
+}
 
 class AllVideos extends React.Component {
   constructor(props){
     super(props)
     this.filterTags = [] // this is to keep track of as select changes
-    this.state = {filterTags: []} // this is to trigger render when 
+
+    let q = this.props.location.search || ""
+    let params = new URLSearchParams(q)
+    let tags = params.getAll("tags")
+    if(tags.length > 0){
+      this.filterTags= tags
+    }
+
+    this.state = {filterTags: this.filterTags} // this is to trigger render when
   }
 
   goToHome = () => this.props.history.push("/")
@@ -39,7 +46,15 @@ class AllVideos extends React.Component {
 
   // we only want to apply the values once the user is done selecting,
   // hence only once the dropdown is gone, we update state and the view.
-  updateFilter = (e) => !e ? this.setState({filterTags:this.filterTags}) : null
+  updateFilter = (e) => {
+    const {history, location} = this.props
+    if(!e){
+      this.setState({filterTags:this.filterTags})
+      let params = new URLSearchParams("")
+      this.filterTags.forEach(tag => params.append("tags", tag))
+      history.replace(`${location.pathname}?${params}`)
+    }
+  }
 
   getNav = () => {
     const options = this.getTagsOpts()
@@ -52,14 +67,43 @@ class AllVideos extends React.Component {
         placeholder="Search by tags"
         showSearch={true}
         allowClear
+        defaultValue={this.filterTags}
         options={options}
         onDropdownVisibleChange={this.updateFilter}
-        onChange={(tags) => this.filterTags = tags}
+        onClear={() => {this.filterTags=[]; this.updateFilter(false)} }
+        onChange={(tags) => {this.filterTags = tags}}
       >
       </Select>
       <SearchOutlined style={{fontSize: "22px"}}/>
     </nav>
   )}
+
+  getSearchResults = (videos, tags) => {
+    return (
+    <>
+      <div className="search-results">
+        You are currently searching for &nbsp;
+        {tags.map(s => <span className="s-tag" key={s}>{s}</span>)}
+      </div>
+      <Collapse
+        ghost
+        expandIconPosition="right"
+        className="video-search-collapse"
+      >
+        { 
+          videos.map(video => (
+            <Panel key={video.id} header={video.title}>
+              {filterNotesByTags(video.notes, tags).map(note =>
+                  <Note key={note.id} data={note} vid={video.id}/>
+              )}
+            </Panel>
+            )
+          )
+        }
+      </Collapse>
+    </>
+    )
+  }
 
   render(){
     let cid = this.props.match.params["courseId"]
@@ -71,10 +115,8 @@ class AllVideos extends React.Component {
         {this.getNav()}
         <div className="video-container">
           <h2 className="course-title">{course.code}: {course.name}</h2>
-          {filterTags.length? 
-            <span>Currently *not* filtering by {filterTags.map(t => `"${t}" `)}</span>
-            : null}
-          { videos.map(video => <Video key={video.id} video={video}/>)}
+          {filterTags.length? this.getSearchResults(videos, filterTags)
+            : videos.map(video => <Video key={video.id} video={video}/>)}
         </div>
       </div>
     )
@@ -106,6 +148,32 @@ function Video({video}){
       {/* should the card also hold some description? user defined? taken from youtube? */}
       <p  className="video-details">{ncount} Notes <b>·</b> {time}</p>
       <img src={image} className="thumbnail" alt={`Thumbnail for ${title}`}/>
+    </div>
+  )
+}
+
+
+/*
+NOTE : CSS is a part of VideoNotes.css
+*/
+function Note(props) {
+  let history = useHistory()
+  const onTimestamp = (sec) => {
+    // should do a history.push(/video/vid?t=sec)
+    history.push(`/video/${props.vid}?t=${sec}`)
+  }
+  const {tags, timestamp, content=""} = props.data
+  return (
+    <div className="note-item">
+        <div className="note-top">
+          <div className="note-ts" onClick={()=>onTimestamp(timestamp)}>{secToStr(timestamp)}</div>
+        </div>
+        <div className="note-content">
+          {content}
+        </div>
+        <div className="note-tags">
+          {tags.map(tag => <div className="note-tag" key={tag}>#{tag}</div>)}
+        </div>
     </div>
   )
 }
