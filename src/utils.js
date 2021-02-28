@@ -90,8 +90,14 @@ export async function getYTDetails(video_id) {
     console.error("ERROR, failed to get video details")
     return video
   }
-  video.sources = decodeStreamMap(JSON.parse(video.player_response))
-  return getSource(video, "video/mp4", "hd720")
+  console.log("video", video)
+  let res = JSON.parse(video.player_response)
+  video.sources = decodeStreamMap(res)
+  let source = getSource(video, "video/mp4", "hd720")
+  let title = res.videoDetails.title.split("+").join(" ")
+  let thumbnail = res.videoDetails.thumbnail.thumbnails[3] ||
+                  res.videoDetails.thumbnail.thumbnails[0]
+  return {  ...source, title, thumbnail: thumbnail.url }
 
   /* SAMPLE RESULTS returned
   {
@@ -110,7 +116,9 @@ export async function getYTDetails(video_id) {
     "approxDurationMs": "162887",
     "audioSampleRate": "44100",
     "audioChannels": 2,
-    "original_url": "https://r1---sn-q0cedn7s.googlevideo.com/..."
+    "original_url": "https://r1---sn-q0cedn7s.googlevideo.com/...",
+    "title": "",
+    "thumbnail": "imgurl.com"
   }
   */
 }

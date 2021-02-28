@@ -4,6 +4,7 @@
 
 .notes-nav {
   display: flex;
+  flex-shrink: 0;
   justify-content: space-between;
   align-items: stretch;
   padding: 10px;
@@ -56,10 +57,12 @@
 
 .notes-shell{
   min-height: 100vh;
+  flex-flow: column;
+  display: flex;
 }
 
 .notes-shell .notes-content-wrapper {
-
+  flex-grow: 1;
 }
 
 .notes-shell .lecture-details {
@@ -204,6 +207,7 @@
 
 .notes-shell .notes-footer {
   background: #3f3f3f;
+  flex-shrink: 0;
   color: white;
   position: sticky;
   bottom: 0px;
@@ -227,6 +231,7 @@
 .video-player {
   width: 100%;
   z-index: 999;
+  flex-shrink: 0;
 }
 
 .video-player.pinned {

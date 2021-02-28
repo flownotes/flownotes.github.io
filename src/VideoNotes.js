@@ -183,7 +183,7 @@ class VideoNotes extends React.Component {
       if(isEmpty(lecture)){
         // create a lecture entry with defaults
         let length = msToMins(parseInt(data["approxDurationMs"]) || 0)
-        lecture = {id:vid, title:"Title", notes:[], image:"/thumbnails/th1.jpg", length}
+        lecture = {id:vid, title:data.title, notes:[], image:data.thumbnail, length}
         createVideoEntry("unclassified", lecture)
       }
       this.setState({ytDetails:data, lectureDetails:lecture})
