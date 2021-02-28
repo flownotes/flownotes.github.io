@@ -1,7 +1,7 @@
 import React from "react"
 import Logo from "./components/Logo"
-import { Select, Collapse } from "antd"
-import { SearchOutlined } from '@ant-design/icons'
+import { Select, Collapse, Menu, Dropdown, Modal } from "antd"
+import { SearchOutlined, SettingFilled } from '@ant-design/icons'
 import { withRouter, useHistory } from "react-router-dom"
 import { secToStr } from "./utils"
 import data from "./data"
@@ -24,8 +24,12 @@ class AllVideos extends React.Component {
     if(tags.length > 0){
       this.filterTags= tags
     }
+    //we don't apply filter when filter dropdown is open
+    this.applyFilter = true //=false when dropdown is open
 
-    this.state = {filterTags: this.filterTags} // this is to trigger render when
+    this.state = {
+      filterTags: this.filterTags,
+    }
   }
 
   goToHome = () => this.props.history.push("/")
@@ -46,14 +50,20 @@ class AllVideos extends React.Component {
 
   // we only want to apply the values once the user is done selecting,
   // hence only once the dropdown is gone, we update state and the view.
-  updateFilter = (e) => {
+  updateFilter = (open) => {
     const {history, location} = this.props
-    if(!e){
+    if(!open){
       this.setState({filterTags:this.filterTags})
       let params = new URLSearchParams("")
       this.filterTags.forEach(tag => params.append("tags", tag))
       history.replace(`${location.pathname}?${params}`)
     }
+  }
+
+  onVideoDeleted = (vid) => {
+    const cid = this.getCid()
+    data[cid].videos = data[cid].videos.filter(video => video.id != vid)
+    this.forceUpdate()
   }
 
   getNav = () => {
@@ -71,7 +81,7 @@ class AllVideos extends React.Component {
         options={options}
         onDropdownVisibleChange={this.updateFilter}
         onClear={() => {this.filterTags=[]; this.updateFilter(false)} }
-        onChange={(tags) => {this.filterTags = tags}}
+        onChange={(tags) => this.filterTags = tags}
       >
       </Select>
       <SearchOutlined style={{fontSize: "22px"}}/>
@@ -79,6 +89,11 @@ class AllVideos extends React.Component {
   )}
 
   getSearchResults = (videos, tags) => {
+    // filter the videos so that at a video has at least one matching note
+    videos = videos.map(video => ({...video, notes:filterNotesByTags(video.notes, tags)}))
+                   .filter(video => video.notes.length > 0)
+    let vids = videos.map(video => video.id)
+
     return (
     <>
       <div className="search-results">
@@ -87,13 +102,14 @@ class AllVideos extends React.Component {
       </div>
       <Collapse
         ghost
+        defaultActiveKey={vids}
         expandIconPosition="right"
         className="video-search-collapse"
       >
-        { 
+        {
           videos.map(video => (
             <Panel key={video.id} header={video.title}>
-              {filterNotesByTags(video.notes, tags).map(note =>
+              { video.notes.map(note => 
                   <Note key={note.id} data={note} vid={video.id}/>
               )}
             </Panel>
@@ -116,7 +132,11 @@ class AllVideos extends React.Component {
         <div className="video-container">
           <h2 className="course-title">{course.code}: {course.name}</h2>
           {filterTags.length? this.getSearchResults(videos, filterTags)
-            : videos.map(video => <Video key={video.id} video={video}/>)}
+            : videos.map(video => <Video 
+                                      key={video.id}
+                                      video={video}
+                                      onDeleted={() => this.onVideoDeleted(video.id)}
+                                  />)}
         </div>
       </div>
     )
@@ -127,7 +147,8 @@ export default withRouter(AllVideos)
 
 
 // the card ui for a single video lecture
-function Video({video}){
+function Video(props){
+  let video = props.video
   const {id, title, length, image, notes} = video
   const ncount = notes.length
 
@@ -135,6 +156,27 @@ function Video({video}){
   const goToCourse = () => {
     history.push(`/video/${id}`)
   }
+
+  const onDeleteing = () => {
+    let content = `You have ${notes.length} notes and will lose all of them.
+    This action is irreversible!`
+    Modal.confirm({
+      title:"Are you sure you want to delete this lecture?",
+      content: content,
+      okText:"Delete",
+      cancelText:"No, keep",
+      okType:"danger",
+      onOk:props.onDeleted
+    })
+  }
+
+  const getEditMenu = () => (
+    <Menu onClick={(e) => e.domEvent.stopPropagation()}>
+      <Menu.Item danger onClick={onDeleteing}>
+        Delete Lecture
+      </Menu.Item>
+    </Menu>
+  )
 
   let h = Math.floor(length / 60)
   let m = length % 60
@@ -144,6 +186,14 @@ function Video({video}){
     <div className="video-card" onClick={goToCourse}>
       <div className="video-card-header">
         <h2 className="video-title">{title}</h2>
+        <Dropdown 
+          overlay={getEditMenu()}
+          trigger={['click']}
+          placement="bottomRight" 
+          overlayClassName="video-card-edit"
+        >
+          <SettingFilled onClick={e => e.stopPropagation()} />
+        </Dropdown>
       </div>
       {/* should the card also hold some description? user defined? taken from youtube? */}
       <p  className="video-details">{ncount} Notes <b>·</b> {time}</p>
