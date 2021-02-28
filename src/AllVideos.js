@@ -82,7 +82,6 @@ class AllVideos extends React.Component {
           if(!open) //dropdown just closed
             this.updateFilter()
         }}
-        // onClear={() => {this.filterTags=[]; this.updateFilter(false)} }
         onChange={tags => {
           this.filterTags = tags
           if(!this.filterOpen) //change without open dropdown

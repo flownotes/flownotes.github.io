@@ -134,6 +134,7 @@ class VideoNotes extends React.Component {
     }
     this.tempEdits = {} //temp data to hold title & class edit details
     this.filterTags = []
+    this.filterOpen = false
   }
 
   goToHome = () => this.props.history.push("/")
@@ -148,15 +149,20 @@ class VideoNotes extends React.Component {
       <Logo style={{height: "36px", width:"36px", padding:"3px"}} onClick={this.goToHome}/>
       <div className="filter-select">
         <Select 
-          mode="tags" 
+          mode="tags"
           className="filter-tags specificiy"
           placeholder="Search by tags"
           showSearch={true}
           allowClear
           options={options}
-          onDropdownVisibleChange={this.updateFilter}
-          onClear={this.clearFilter}
-          onChange={(tags) => this.filterTags = tags}
+          onDropdownVisibleChange={(open) => {
+            this.filterOpen = open
+            if(!open) this.updateFilter()
+          }}
+          onChange={(tags) => {
+            this.filterTags = tags
+            if(!this.filterOpen) this.updateFilter()
+          }}
         >
         </Select>
         <SearchOutlined style={{fontSize: "22px"}}/>
@@ -165,11 +171,6 @@ class VideoNotes extends React.Component {
   )}
 
   updateFilter = () => {
-    this.setState({search:this.filterTags})
-  }
-
-  clearFilter = () => {
-    this.filterTags = []
     this.setState({search:this.filterTags})
   }
 
