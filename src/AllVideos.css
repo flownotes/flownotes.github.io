@@ -98,3 +98,22 @@ nav.all-videos-nav > span:hover {
   height: auto;
   border: 1px solid darkgray;
 }
+
+/* Search UI */
+
+.videos-shell .video-search-collapse {
+  margin: 20px 0;
+}
+
+.videos-shell .video-search-collapse .ant-collapse-header {
+  background: ghostwhite;
+  margin-bottom: 20px;
+  font-size: 16px;
+  border: 1px solid grey;
+}
+
+.videos-shell .video-search-collapse .ant-collapse-item
+  .ant-collapse-content > .ant-collapse-content-box {
+    padding-right: 7px;
+    padding-left: 7px;
+}

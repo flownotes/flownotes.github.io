@@ -1,9 +1,9 @@
 import React from "react"
-import { withRouter } from "react-router-dom"
+import { withRouter, Prompt } from "react-router-dom"
 import { Spin, Skeleton, Dropdown, Modal, Select,
          Menu, message, TimePicker, Button, Input } from "antd"
 import { SearchOutlined, SettingFilled, PlusOutlined, PushpinOutlined,
-         PushpinFilled, EditOutlined, CameraOutlined, } from '@ant-design/icons'
+         PushpinFilled, EditOutlined } from '@ant-design/icons'
 import moment from 'moment'
 
 import Logo from "./components/Logo"
@@ -293,7 +293,7 @@ class VideoNotes extends React.Component {
   getLoadingDOM = () => <Skeleton active/>
 
   render(){
-    let { lectureDetails, ytDetails:{url}, 
+    let { lectureDetails, ytDetails:{url}, editingLecture,
           editingNote, pinned, search, newNote } = this.state
     const vid = this.getVideoId()
     const loading = isEmpty(lectureDetails)
@@ -322,6 +322,10 @@ class VideoNotes extends React.Component {
             />
             {this.getTitleModal()}
           </div>
+          <Prompt
+            when={(editingNote || editingLecture)?true:false}
+            message={_ => "You have unsaved edits! Are you sure you want to move away?"}
+          />
           {
             search.length > 0? <div className="search-results">You are currently searching for &nbsp;
                     {search.map(s => <span className="s-tag" key={s}>{s}</span>)}
@@ -560,9 +564,12 @@ class VideoPlayer extends React.Component{
   }
 
   getVideoDOM = () => {
+    let params = new URLSearchParams(window.location.search)
+    let time = 0
+    if (params.get('t') != null) time = parseInt(params.get('t'))
     const src = this.props.url || ""
     const height = `${this.state.width * (9/16)}px`
-    return <video id='vid' controls src={src} style={{height}} />
+    return <video id='vid' autoPlay controls src={`${src}#t=${time}`} style={{height}} />
   }
 
   getLoadingDOM = () => {

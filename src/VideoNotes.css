@@ -90,8 +90,9 @@
   border: 2px solid #79794f;
 }
 
-.notes-shell .search-results .s-tag {
-  padding: 3px;
+.notes-shell .search-results .s-tag,
+.videos-shell .search-results .s-tag {
+  padding: 2px 4px;
   border: 1px solid gold;
   background: #fbff66;
   margin-right: 7px;
@@ -103,7 +104,8 @@
   padding: 10px 5px;
 }
 
-.notes-shell .note-item {
+.notes-shell .note-item,
+.videos-shell .note-item {
   padding: 10px;
   margin-bottom: 1.75em;
   border: 1px solid darkgrey;
