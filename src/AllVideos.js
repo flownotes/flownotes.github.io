@@ -25,7 +25,7 @@ class AllVideos extends React.Component {
       this.filterTags= tags
     }
     //we don't apply filter when filter dropdown is open
-    this.applyFilter = true //=false when dropdown is open
+    this.filterOpen = false
 
     this.state = {
       filterTags: this.filterTags,
@@ -49,15 +49,13 @@ class AllVideos extends React.Component {
   }
 
   // we only want to apply the values once the user is done selecting,
-  // hence only once the dropdown is gone, we update state and the view.
-  updateFilter = (open) => {
+  // hence cache in this.filterTags, and update state when necessary.
+  updateFilter = () => {
     const {history, location} = this.props
-    if(!open){
-      this.setState({filterTags:this.filterTags})
-      let params = new URLSearchParams("")
-      this.filterTags.forEach(tag => params.append("tags", tag))
-      history.replace(`${location.pathname}?${params}`)
-    }
+    this.setState({filterTags:this.filterTags})
+    let params = new URLSearchParams("")
+    this.filterTags.forEach(tag => params.append("tags", tag))
+    history.replace(`${location.pathname}?${params}`)
   }
 
   onVideoDeleted = (vid) => {
@@ -79,9 +77,17 @@ class AllVideos extends React.Component {
         allowClear
         defaultValue={this.filterTags}
         options={options}
-        onDropdownVisibleChange={this.updateFilter}
-        onClear={() => {this.filterTags=[]; this.updateFilter(false)} }
-        onChange={(tags) => this.filterTags = tags}
+        onDropdownVisibleChange={(open) => {
+          this.filterOpen = open
+          if(!open) //dropdown just closed
+            this.updateFilter()
+        }}
+        // onClear={() => {this.filterTags=[]; this.updateFilter(false)} }
+        onChange={tags => {
+          this.filterTags = tags
+          if(!this.filterOpen) //change without open dropdown
+            this.updateFilter() //update immediately
+        }}
       >
       </Select>
       <SearchOutlined style={{fontSize: "22px"}}/>
