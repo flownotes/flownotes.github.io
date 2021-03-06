@@ -92,6 +92,9 @@ export async function getYTDetails(video_id) {
   }
   console.log("video", video)
   let res = JSON.parse(video.player_response)
+  if(!res.streamingData){
+    throw "Video cannot be played due to youtube permission restrictions by video owner"
+  }
   video.sources = decodeStreamMap(res)
   let source = getSource(video, "video/mp4", "hd720")
   let title = res.videoDetails.title.split("+").join(" ")

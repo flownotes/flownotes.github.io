@@ -190,6 +190,12 @@ class VideoNotes extends React.Component {
         createVideoEntry("unclassified", lecture)
       }
       this.setState({ytDetails:data, lectureDetails:lecture})
+    }).catch(e => {
+      Modal.error({
+        title:e,
+        okText:"Okay",
+        onOk:this.props.history.goBack
+      })
     })
   }
 
