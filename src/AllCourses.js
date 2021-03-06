@@ -120,6 +120,7 @@ export default class AllCourses extends React.Component {
 
     let cid = "cid" + Date.now().toString()
     data[cid] = {code, name, vcount:0, active:true}
+    localStorage.setItem("data", JSON.stringify(data))
     this.toggleAdd()
     message.success(<span>Course "<b>{code}</b> : {name}" successfully created!</span>)
   }
@@ -129,24 +130,28 @@ export default class AllCourses extends React.Component {
 
     let cid = this.currentCourse
     data[cid] = Object.assign(data[cid], {code, name})
+    localStorage.setItem("data", JSON.stringify(data))
     this.toggleEdit()
     message.success(<span>Course "<b>{code}</b> : {name}" successfully edited!</span>)
   }
   archiveCourse = () => {
     let {code, name} = data[this.currentCourse]
     data[this.currentCourse].active = false
+    localStorage.setItem("data", JSON.stringify(data))
     this.toggleArchive()
     message.success(<span>Course "<b>{code}</b> : {name}" successfully archived!</span>)
   }
   unArchiveCourse = () => {
     let {code, name} = data[this.currentCourse]
     data[this.currentCourse].active = true
+    localStorage.setItem("data", JSON.stringify(data))
     this.toggleUnArchive()
     message.success(<span>Course "<b>{code}</b> : {name}" successfully unarchived!</span>)
   }
   deleteCourse = () => {
     let {code, name} = data[this.currentCourse]
     delete data[this.currentCourse]
+    localStorage.setItem("data", JSON.stringify(data))
     this.toggleDelete()
     message.success(<span>Course "<b>{code}</b> : {name}" successfully deleted!</span>)
   }

@@ -88,7 +88,7 @@ let videos = [
   },
 ]
 
-let data = {
+let _data = {
   cid1 : {
     code: "CSE 110",
     name: "Software Engineering",
@@ -140,6 +140,12 @@ let data = {
   }
 }
 
-export default data
-
+// if LS is not set, set it to this default
+if(!localStorage.getItem("data")){
+  localStorage.setItem("data", JSON.stringify(_data))
+}
+// and initialise data to LS data
+let data = JSON.parse(localStorage.getItem("data"))
 window.data = data
+
+export default data
