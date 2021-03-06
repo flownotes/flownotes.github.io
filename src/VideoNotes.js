@@ -80,7 +80,7 @@ function getVideoCourse(vid){
 function createVideoEntry(cid, lectureDetails){
   // were pushing the lecture directly, any changes
   // we make to it should also reflect on 'data'
-  data[cid].videos.push(lectureDetails)
+  data[cid].videos.unshift(lectureDetails)
   localStorage.setItem("data", JSON.stringify(data))
 }
 
@@ -182,14 +182,21 @@ class VideoNotes extends React.Component {
     let lecture = getVideoDetails(vid)
 
     // get the media details
-    getYTDetails(vid).then(data => {
+    getYTDetails(vid).then(res => {
       if(isEmpty(lecture)){
         // create a lecture entry with defaults
-        let length = msToMins(parseInt(data["approxDurationMs"]) || 0)
-        lecture = {id:vid, title:data.title, notes:[], image:data.thumbnail, length}
-        createVideoEntry("unclassified", lecture)
+        let length = msToMins(parseInt(res["approxDurationMs"]) || 0)
+        lecture = {id:vid, title:res.title, notes:[], image:res.thumbnail, length}
+        let cid = this.props.location.state?.class || "unclassified"
+        createVideoEntry(cid, lecture)
+        // message.success("Created a new lecture under " + data[cid].name)
+        message.success({
+            duration:3,
+            content:`Created a new lecture under "${data[cid].name}"`,
+            top:100,
+        })
       }
-      this.setState({ytDetails:data, lectureDetails:lecture})
+      this.setState({ytDetails:res, lectureDetails:lecture})
     }).catch(e => {
       Modal.error({
         title:e,

@@ -1,14 +1,14 @@
 import React from "react"
 import Logo from "./components/Logo"
-import { Select, Collapse, Menu, Dropdown, Modal } from "antd"
-import { SearchOutlined, SettingFilled } from '@ant-design/icons'
+import { Select, Collapse, Menu, Dropdown, Modal, Input } from "antd"
+import { SearchOutlined, SettingFilled, PlusOutlined, CaretRightOutlined } from '@ant-design/icons'
 import { withRouter, useHistory } from "react-router-dom"
-import { secToStr } from "./utils"
+import { secToStr, urlToVid } from "./utils"
 import data from "./data"
 import "./AllVideos.css"
 
-
-const { Panel } = Collapse;
+const { Search } = Input
+const { Panel } = Collapse
 function filterNotesByTags(notes, tags){
   return notes.filter(note => tags.some(tag => note.tags.includes(tag)))
 }
@@ -29,6 +29,8 @@ class AllVideos extends React.Component {
 
     this.state = {
       filterTags: this.filterTags,
+      addingLecture: false, //modal that opens while adding lecture
+      lectureValid: true,
     }
   }
 
@@ -94,6 +96,42 @@ class AllVideos extends React.Component {
     </nav>
   )}
 
+  getAddModal = () => {
+    const errMsg = <p className="err-msg">Please ensure that the URL is formatted correctly!</p>
+    return (
+      <Modal
+        className="add-lecture-modal"
+        title="Add a new lecture"
+        onCancel={() => this.setState({addingLecture:false})}
+        visible={this.state.addingLecture}
+        destroyOnClose
+        footer={null}
+      >
+        <h3 style={{textAlign:"center", marginBottom:"15px"}}> Video Link </h3>
+        <Search
+          placeholder="Enter video link"
+          allowClear
+          enterButton={<CaretRightOutlined />}
+          onSearch={this.addLecture}
+        />
+        {this.state.lectureValid? null: errMsg}
+      </Modal>
+    )
+  }
+
+  addLecture = (val) => {
+    if (val === "") {
+      return
+    }
+    let id = urlToVid(val)
+    if(id === "") {
+      this.setState({lectureValid: false})
+    }
+    else{
+      this.props.history.push(`/video/${id}`, {class:this.getCid()})
+    }
+  }
+
   getSearchResults = (videos, tags) => {
     // filter the videos so that at a video has at least one matching note
     videos = videos.map(video => ({...video, notes:filterNotesByTags(video.notes, tags)}))
@@ -136,7 +174,10 @@ class AllVideos extends React.Component {
       <div className="videos-shell">
         {this.getNav()}
         <div className="video-container">
-          <h2 className="course-title">{course.code}: {course.name}</h2>
+          <div className="course-title-container">
+            <h2 className="course-title">{course.code}: {course.name}</h2>
+            <PlusOutlined onClick={() => this.setState({addingLecture:true})}/>
+          </div>
           {filterTags.length? this.getSearchResults(videos, filterTags)
             : videos.map(video => <Video 
                                       key={video.id}
@@ -144,6 +185,7 @@ class AllVideos extends React.Component {
                                       onDeleted={() => this.onVideoDeleted(video.id)}
                                   />)}
         </div>
+        {this.getAddModal()}
       </div>
     )
   }

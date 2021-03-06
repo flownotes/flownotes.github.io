@@ -31,6 +31,27 @@ export function strToSec(str){
   return sec
 }
 
+//takes in youtube url, returns vid
+export function urlToVid(val){
+    if(!val.startsWith("http")){
+      val = "https://"+val
+    }
+    let url = ""
+    try {
+      url = new URL(val)
+    } catch(e) {
+      console.log(e)
+      return ""
+    }
+  
+    if ((url.host == "www.youtube.com" || url.host == "youtube.com") && 
+        (url.pathname == "/watch")){
+          return url.searchParams.get("v")
+    }
+    // should I also confirm url isn't a 404?
+    return ""
+}
+
 export async function getYTDetails(video_id) {
   const decodeQueryString = (queryString) => {
     let key, keyValPair, keyValPairs, r, val, _i, _len
@@ -90,7 +111,6 @@ export async function getYTDetails(video_id) {
     console.error("ERROR, failed to get video details")
     return video
   }
-  console.log("video", video)
   let res = JSON.parse(video.player_response)
   if(!res.streamingData){
     throw "Video cannot be played due to youtube permission restrictions by video owner"

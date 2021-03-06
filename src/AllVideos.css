@@ -51,11 +51,39 @@ nav.all-videos-nav > span:hover {
   color: white;
 }
 
-.videos-shell .video-container .course-title {
+.videos-shell .video-container .course-title-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   margin: 10px 0 20px 0;
+  padding-left: 7px;
+  padding-right: 7px;
+}
+
+.videos-shell .course-title-container .anticon {
+  font-size: 22px;
+  padding: 5px;
+  background: lightgray;
+  border: 1px solid rgba(0,0,0,.2);
+  border-radius: 4px;
+  box-shadow: 0px 0px 6px -1px rgb(0 0 0 / 20%);
+  cursor: pointer;
+}
+
+.add-lecture-modal .err-msg {
+  font-style: italic;
+  font-size: 12px;
+  margin-top: 0.5em;
+  color: tomato;
+}
+
+
+.videos-shell .video-container .course-title {
+  margin: 0;
   font-size: 22px;
   font-weight: 400;
-  padding-left: 7px;
+  margin-right: 10px;
+  flex: 1;
 }
 
 .video-card {
