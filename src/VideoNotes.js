@@ -81,6 +81,7 @@ function createVideoEntry(cid, lectureDetails){
   // were pushing the lecture directly, any changes
   // we make to it should also reflect on 'data'
   data[cid].videos.push(lectureDetails)
+  localStorage.setItem("data", JSON.stringify(data))
 }
 
 // get's all the courses in options format
@@ -113,6 +114,7 @@ function editVideoDetails(videoDetails){
   let course = getVideoCourse(videoDetails.id)
   let uIndex = course.videos.findIndex((video) => video.id == videoDetails.id)
   course.videos[uIndex] = videoDetails
+  localStorage.setItem("data", JSON.stringify(data))
 }
 
 // checks if note has at least one tag of tags
@@ -209,6 +211,7 @@ class VideoNotes extends React.Component {
         editVideoDetails(newLecture)
         this.setState({lectureDetails: newLecture})
        */
+      localStorage.setItem("data", JSON.stringify(data))
     }
     this.setState({editingNote:null, newNote:false})
     if (update)
@@ -231,6 +234,7 @@ class VideoNotes extends React.Component {
     let notes = this.state.lectureDetails.notes
     notes.push(newNote)
     notes.sort((n1, n2) => n1.timestamp - n2.timestamp)
+    localStorage.setItem("data", JSON.stringify(data))
     this.setState({editingNote:id, pinned:false, newNote:true})
     document.querySelector("#vid").pause()
   }
@@ -246,11 +250,14 @@ class VideoNotes extends React.Component {
 
       // move it into new cid
       data[newCid].videos.unshift(this.state.lectureDetails)
+      localStorage.setItem("data", JSON.stringify(data))
     }
-    if(this.tempEdits.title)
+    if(this.tempEdits.title){
       // bad practice ¯\_(ツ)_/¯
       // should setState + update data with new obj
       this.state.lectureDetails.title = this.tempEdits.title
+      localStorage.setItem("data", JSON.stringify(data))
+    }
 
     this.setState({editingLecture:false})
     this.tempEdits = {}

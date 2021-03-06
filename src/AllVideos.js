@@ -61,6 +61,7 @@ class AllVideos extends React.Component {
   onVideoDeleted = (vid) => {
     const cid = this.getCid()
     data[cid].videos = data[cid].videos.filter(video => video.id != vid)
+    localStorage.setItem("data", JSON.stringify(data))
     this.forceUpdate()
   }
 
