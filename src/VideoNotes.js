@@ -400,8 +400,7 @@ class VideoNotes extends React.Component {
           />
           {
             search.length > 0? <div className="search-results">You are currently searching for &nbsp;
-                    {search.map(s => <span className="s-tag" key={s}>{s}</span>)}
-                <br/>
+                    <p style={{margin: "7px 0"}}>{search.map(s => <span className="s-tag" key={s}>{s}</span>)}</p>
                 <span style={{color:"gray"}}>To edit or create new notes, please clear the search.</span>
             </div> 
             : null
