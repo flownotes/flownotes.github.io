@@ -132,7 +132,6 @@ nav.all-videos-nav > span:hover {
 .video-card-header {
   display: flex;
   justify-content: space-between;
-  align-items: center;
   margin-bottom: 4px;
 }
 
@@ -145,13 +144,14 @@ nav.all-videos-nav > span:hover {
   justify-content: flex-end;
 }
 
-.video-title {
+.video-card .video-title {
   font-size: 18px;
   font-weight: 400;
   margin-bottom: 0px;
+  margin-right: 7px;
 }
 
-.video-details{
+.video-card .video-details{
   color: gray;
   margin-bottom: 10px;
 }

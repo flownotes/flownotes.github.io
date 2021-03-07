@@ -92,49 +92,42 @@ let _data = {
   cid1 : {
     code: "CSE 110",
     name: "Software Engineering",
-    vcount: 14, //TODO: this should go, update AllCourses
     active: true,
     videos: JSON.parse(JSON.stringify(videos))
   },
   cid2 : {
     code: "CSE 141",
     name: "Introduction to Computer Architecture",
-    vcount: 12,
     active: true,
     videos: JSON.parse(JSON.stringify(videos))
   },
   cid3 : {
     code: "CSE 121",
     name: "Systems Design",
-    vcount: 15,
     active: true,
     videos: JSON.parse(JSON.stringify(videos))
   },
   cid4 : {
     code: "CSE 101",
     name: "Computational Thinking",
-    vcount: 9,
     active: true,
     videos: JSON.parse(JSON.stringify(videos))
   },
   cid5 : {
     code: "CSE 100",
     name: "Basic CS stuff",
-    vcount: 15,
     active: false,
     videos: JSON.parse(JSON.stringify(videos))
   },
   cid6 : {
     code: "CSE 111",
     name: "Web design and development",
-    vcount: 9,
     active: false,
     videos: JSON.parse(JSON.stringify(videos))
   },
   unclassified : {
     code: "Unclassified",
     name: "Videos which belong to no class",
-    vcount: 0,
     active: true,
     videos: []
   }

@@ -170,7 +170,8 @@ class AllVideos extends React.Component {
     let cid = this.props.match.params["courseId"]
     const {filterTags} = this.state
     const course = data[cid]
-    const videos = course.videos
+    const videos = [...course.videos]
+    videos.sort((v1,v2) => v1.title < v2.title? 1:-1)
     return (
       <div className="videos-shell">
         {this.getNav()}

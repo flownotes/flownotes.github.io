@@ -5,6 +5,8 @@ import { PlusOutlined, SettingFilled, WarningFilled } from '@ant-design/icons'
 import { useHistory } from "react-router-dom";
 import data from "./data"
 import "./AllCourses.css"
+import { randstr } from "./utils"
+
 const { Panel } = Collapse;
 
 
@@ -118,8 +120,8 @@ export default class AllCourses extends React.Component {
     let code = this.codeInputRef.state.value
     let name = this.nameInputRef.state.value
 
-    let cid = "cid" + Date.now().toString()
-    data[cid] = {code, name, vcount:0, active:true}
+    let cid = "cid-" + randstr()
+    data[cid] = {code, name, active:true, videos:[]}
     localStorage.setItem("data", JSON.stringify(data))
     this.toggleAdd()
     message.success(<span>Course "<b>{code}</b> : {name}" successfully created!</span>)
@@ -159,6 +161,13 @@ export default class AllCourses extends React.Component {
   render(){
     let objs = Object.keys(data)
     let {addModal, editModal, archiveModal, deleteModal, unArchiveModal} = this.state
+
+    let cr_active = objs.filter(key => data[key].active)
+    cr_active.sort((cid1, cid2) => data[cid1].code > data[cid2].code? 1:-1)
+
+    let cr_archived = objs.filter(key => !data[key].active)
+    cr_archived.sort((cid1, cid2) => data[cid1].code > data[cid2].code? 1:-1)
+
     return (
       <div className="courses-shell">
         <Nav onAddCourse={this.toggleAdd}/>
@@ -168,8 +177,7 @@ export default class AllCourses extends React.Component {
                   expandIconPosition="right" 
                   className="course-collapse more-specificity">
           <Panel header="Active" key="1">
-            { objs.filter(key => data[key].active)
-                  .map(key => <Course key={key} cid={key}
+            { cr_active.map(key => <Course key={key} cid={key}
                               onEdit={() => this.toggleEdit(key) }
                               onArchive={() => this.toggleArchive(key)}
                               onDelete={() => this.toggleDelete(key)} />
@@ -177,8 +185,7 @@ export default class AllCourses extends React.Component {
             }
           </Panel>
           <Panel header="Archived" key="2">
-            { objs.filter(key => !data[key].active)
-                  .map(key => <Course key={key} cid={key}
+            { cr_archived.map(key => <Course key={key} cid={key}
                               onEdit={() => this.toggleEdit(key) }
                               onUnArchive={() => this.toggleUnArchive(key)}
                               onDelete={() => this.toggleDelete(key)} />
@@ -264,7 +271,8 @@ function Nav({onAddCourse}){
 
 // the card ui for a single course
 function Course(props){
-  const {name, code, vcount} = data[props.cid]
+  const {name, code} = data[props.cid]
+  let vcount = data[props.cid].videos.length
   const {onEdit, onArchive, onDelete, onUnArchive} = props
 
   let history = useHistory()
@@ -288,7 +296,7 @@ function Course(props){
         </Dropdown>
       </div>
       <p  className="course-name">{name}</p>
-      <p  className="course-vcount">{vcount} videos</p>
+      <p  className="course-vcount">{vcount} Lectures </p>
     </div>
   )
 }
