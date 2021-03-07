@@ -77,6 +77,27 @@ nav.all-videos-nav > span:hover {
   color: tomato;
 }
 
+.add-lecture-modal .ant-modal-header {
+  border-bottom: 1px solid lightgray;
+}
+
+.add-lecture-modal .ant-modal-title {
+  text-align: center;
+}
+
+.add-lecture-modal .ant-modal-body {
+  min-height: 150px;
+  display: flex;
+  flex-flow: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.add-lecture-modal .ant-modal-body h3{
+  text-align: center;
+  font-size: 20px;
+  font-weight: 300;
+}
 
 .videos-shell .video-container .course-title {
   margin: 0;

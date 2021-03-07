@@ -3,11 +3,11 @@ import { withRouter, Prompt } from "react-router-dom"
 import { Spin, Skeleton, Dropdown, Modal, Select,
          Menu, message, TimePicker, Button, Input } from "antd"
 import { SearchOutlined, SettingFilled, PlusOutlined, PushpinOutlined,
-         PushpinFilled, EditOutlined } from '@ant-design/icons'
+         PushpinFilled } from '@ant-design/icons'
 import moment from 'moment'
 
 import Logo from "./components/Logo"
-import { getYTDetails, isEmpty, msToMins, secToStr, strToSec, randstr } from "./utils"
+import { getYTDetails, isEmpty, msToMins, secToStr, strToSec, randstr, historyLen } from "./utils"
 import data from "./data"
 
 import "./VideoNotes.css"
@@ -311,6 +311,48 @@ class VideoNotes extends React.Component {
     )
   }
 
+  getEditMenu = () => {
+    return(
+    <Menu onClick={(e) => e.domEvent.stopPropagation()}>
+      <Menu.Item onClick={() => this.setState({editingLecture: true, tempEdits: {}})}>
+        Edit Details
+      </Menu.Item>
+      <Menu.Item danger onClick={this.onDeleteing}>
+        Delete Lecture
+      </Menu.Item>
+    </Menu>)
+  }
+
+  onDeleteing = () => {
+    let notes = this.state.lectureDetails.notes
+    let content = `You have ${notes.length} notes and will lose all of them.
+    This action is irreversible!`
+    Modal.confirm({
+      title:"Are you sure you want to delete this lecture?",
+      content: content,
+      okText:"Delete",
+      cancelText:"No, keep",
+      okType:"danger",
+      onOk: this.deleteLecture
+    })
+  }
+
+  deleteLecture = () => {
+    let lecture = this.state.lectureDetails
+    const cid = getVideoCourse(lecture.id).cid
+    data[cid].videos = data[cid].videos.filter(video => video.id != lecture.id)
+    localStorage.setItem("data", JSON.stringify(data))
+    message.success(`Lecture "${lecture.title}" has been deleted!`)
+    if(this.props.history.length == historyLen){
+      // if the history is the same as when it first loaded => this is the
+      // first page and going back would take us away from flow notes
+      this.props.history.replace("/")
+      //only prob when you hit len=50, doesn't inc any more
+    }
+    else // we will still stay in the app even if we go back
+      this.props.history.goBack()
+  }
+
   getLoadingDOM = () => <Skeleton active/>
 
   render(){
@@ -337,10 +379,14 @@ class VideoNotes extends React.Component {
               <h2 className="lecture-title">{lectureDetails.title}</h2>
               <span className="lecture-course">{course.code} <b>·</b> {course.name}</span>
             </div>
-            <EditOutlined 
-              style={{fontSize:"20px", padding:"0 10px", cursor:"pointer"}}
-              onClick={() => this.setState({editingLecture: true, tempEdits: {}})}
-            />
+            <Dropdown
+              overlay={this.getEditMenu()}
+              trigger={['click']}
+              placement="bottomRight"
+              overlayClassName=""
+            >
+              <SettingFilled onClick={e => e.stopPropagation()} />
+            </Dropdown>
             {this.getTitleModal()}
           </div>
           <Prompt

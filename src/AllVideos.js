@@ -107,7 +107,7 @@ class AllVideos extends React.Component {
         destroyOnClose
         footer={null}
       >
-        <h3 style={{textAlign:"center", marginBottom:"15px"}}> Video Link </h3>
+        <h3> Video Link </h3>
         <Search
           placeholder="Enter video link"
           allowClear
