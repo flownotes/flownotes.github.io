@@ -81,8 +81,14 @@
 
 .notes-shell .lecture-details .lecture-course{
   font-size: 16px;
-  color: gray;
-  font-weight: 500;
+  font-weight: 300;
+  color: #1890ff;
+  display: flex;
+  align-items: center;
+}
+
+.notes-shell .lecture-details .lecture-course b{
+  margin: 0 6px;
 }
 
 .notes-shell .lecture-details .anticon {

@@ -1,8 +1,9 @@
 import React from "react"
 import Logo from "./components/Logo"
-import { Select, Collapse, Menu, Dropdown, Modal, Input } from "antd"
-import { SearchOutlined, SettingFilled, PlusOutlined, CaretRightOutlined } from '@ant-design/icons'
-import { withRouter, useHistory } from "react-router-dom"
+import { Select, Collapse, Menu, Dropdown, Modal, Input, Breadcrumb } from "antd"
+import { SearchOutlined, SettingFilled, PlusOutlined,
+         CaretRightOutlined, HomeOutlined } from '@ant-design/icons'
+import { withRouter, useHistory, Link } from "react-router-dom"
 import { secToStr, urlToVid } from "./utils"
 import data from "./data"
 import "./AllVideos.css"
@@ -173,6 +174,20 @@ class AllVideos extends React.Component {
     return (
       <div className="videos-shell">
         {this.getNav()}
+        <Breadcrumb
+          separator={<CaretRightOutlined />}
+        >
+          <Breadcrumb.Item>
+            <Link to="/"><HomeOutlined /></Link>
+          </Breadcrumb.Item>
+          <Breadcrumb.Item>
+            <Link to="/notes">Courses</Link>
+          </Breadcrumb.Item>
+          <Breadcrumb.Item>
+            {course.code}
+          </Breadcrumb.Item>
+        </Breadcrumb>
+
         <div className="video-container">
           <div className="course-title-container">
             <h2 className="course-title">{course.code}: {course.name}</h2>

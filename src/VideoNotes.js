@@ -1,9 +1,9 @@
 import React from "react"
-import { withRouter, Prompt } from "react-router-dom"
+import { withRouter, Prompt, Link } from "react-router-dom"
 import { Spin, Skeleton, Dropdown, Modal, Select,
          Menu, message, TimePicker, Button, Input } from "antd"
 import { SearchOutlined, SettingFilled, PlusOutlined, PushpinOutlined,
-         PushpinFilled } from '@ant-design/icons'
+         PushpinFilled, ArrowRightOutlined } from '@ant-design/icons'
 import moment from 'moment'
 
 import Logo from "./components/Logo"
@@ -377,7 +377,12 @@ class VideoNotes extends React.Component {
           <div className="lecture-details">
             <div>
               <h2 className="lecture-title">{lectureDetails.title}</h2>
-              <span className="lecture-course">{course.code} <b>·</b> {course.name}</span>
+              <Link to={`/notes/${course.cid}`}>
+                <span className="lecture-course">
+                  {course.code} <b>·</b> {course.name}
+                  <ArrowRightOutlined style={{fontSize:"14px", paddingLeft:"6px"}} />
+                </span>
+              </Link>
             </div>
             <Dropdown
               overlay={this.getEditMenu()}
